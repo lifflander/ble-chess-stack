@@ -16,11 +16,10 @@
 		012C307E226FD59500BADEF9 /* TransferService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 012C307D226FD59500BADEF9 /* TransferService.swift */; };
 		8C33E62E2A29398E00C54D1A /* ScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C33E62D2A29398E00C54D1A /* ScanViewController.swift */; };
 		8C33E6302A29566500C54D1A /* ConnectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C33E62F2A29566500C54D1A /* ConnectViewController.swift */; };
-		A9A7C756227E1D6200F2CC59 /* README.md in Resources */ = {isa = PBXBuildFile; fileRef = A9A7C755227E1D6200F2CC59 /* README.md */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
-		012C3064226FD13B00BADEF9 /* CoreBluetoothLESample.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = CoreBluetoothLESample.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		012C3064226FD13B00BADEF9 /* BLE-Chess.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = "BLE-Chess.app"; sourceTree = BUILT_PRODUCTS_DIR; };
 		012C3067226FD13B00BADEF9 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		012C306C226FD13B00BADEF9 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/Main.storyboard; sourceTree = "<group>"; };
 		012C306E226FD13B00BADEF9 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
@@ -29,11 +28,9 @@
 		012C3079226FD27600BADEF9 /* CentralViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CentralViewController.swift; sourceTree = "<group>"; };
 		012C307B226FD28C00BADEF9 /* PeripheralViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PeripheralViewController.swift; sourceTree = "<group>"; };
 		012C307D226FD59500BADEF9 /* TransferService.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TransferService.swift; sourceTree = "<group>"; };
-		53F76A1B5D2A119C156B3CA9 /* LICENSE.txt */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text; path = LICENSE.txt; sourceTree = "<group>"; };
 		8C33E62D2A29398E00C54D1A /* ScanViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ScanViewController.swift; sourceTree = "<group>"; };
 		8C33E62F2A29566500C54D1A /* ConnectViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ConnectViewController.swift; sourceTree = "<group>"; };
 		940DB595832554E780C12D56 /* SampleCode.xcconfig */ = {isa = PBXFileReference; lastKnownFileType = text.xcconfig; name = SampleCode.xcconfig; path = Configuration/SampleCode.xcconfig; sourceTree = "<group>"; };
-		A9A7C755227E1D6200F2CC59 /* README.md */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
 		A9FCEFA72293634C008CC0CF /* MapKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = MapKit.framework; path = System/Library/Frameworks/MapKit.framework; sourceTree = SDKROOT; };
 /* End PBXFileReference section */
 
@@ -51,19 +48,17 @@
 		012C305B226FD13B00BADEF9 = {
 			isa = PBXGroup;
 			children = (
-				A9A7C755227E1D6200F2CC59 /* README.md */,
 				012C3066226FD13B00BADEF9 /* CoreBluetoothLESample */,
 				012C3065226FD13B00BADEF9 /* Products */,
 				A9FCEFA62293634C008CC0CF /* Frameworks */,
 				D0887E186C8C54F49A98DFAD /* Configuration */,
-				A7FD33C910FB77A99DA27DF6 /* LICENSE */,
 			);
 			sourceTree = "<group>";
 		};
 		012C3065226FD13B00BADEF9 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				012C3064226FD13B00BADEF9 /* CoreBluetoothLESample.app */,
+				012C3064226FD13B00BADEF9 /* BLE-Chess.app */,
 			);
 			name = Products;
 			sourceTree = "<group>";
@@ -85,14 +80,6 @@
 			path = CoreBluetoothLESample;
 			sourceTree = "<group>";
 		};
-		A7FD33C910FB77A99DA27DF6 /* LICENSE */ = {
-			isa = PBXGroup;
-			children = (
-				53F76A1B5D2A119C156B3CA9 /* LICENSE.txt */,
-			);
-			path = LICENSE;
-			sourceTree = "<group>";
-		};
 		A9FCEFA62293634C008CC0CF /* Frameworks */ = {
 			isa = PBXGroup;
 			children = (
@@ -112,9 +99,9 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		012C3063226FD13B00BADEF9 /* CoreBluetoothLESample */ = {
+		012C3063226FD13B00BADEF9 /* BLE-Chess */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = 012C3076226FD13B00BADEF9 /* Build configuration list for PBXNativeTarget "CoreBluetoothLESample" */;
+			buildConfigurationList = 012C3076226FD13B00BADEF9 /* Build configuration list for PBXNativeTarget "BLE-Chess" */;
 			buildPhases = (
 				012C3060226FD13B00BADEF9 /* Sources */,
 				012C3061226FD13B00BADEF9 /* Frameworks */,
@@ -124,9 +111,9 @@
 			);
 			dependencies = (
 			);
-			name = CoreBluetoothLESample;
+			name = "BLE-Chess";
 			productName = BTLETransfer;
-			productReference = 012C3064226FD13B00BADEF9 /* CoreBluetoothLESample.app */;
+			productReference = 012C3064226FD13B00BADEF9 /* BLE-Chess.app */;
 			productType = "com.apple.product-type.application";
 		};
 /* End PBXNativeTarget section */
@@ -146,7 +133,7 @@
 					};
 				};
 			};
-			buildConfigurationList = 012C305F226FD13B00BADEF9 /* Build configuration list for PBXProject "CoreBluetoothLESample" */;
+			buildConfigurationList = 012C305F226FD13B00BADEF9 /* Build configuration list for PBXProject "BLE-Chess" */;
 			compatibilityVersion = "Xcode 9.3";
 			developmentRegion = en;
 			hasScannedForEncodings = 0;
@@ -159,7 +146,7 @@
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				012C3063226FD13B00BADEF9 /* CoreBluetoothLESample */,
+				012C3063226FD13B00BADEF9 /* BLE-Chess */,
 			);
 		};
 /* End PBXProject section */
@@ -171,7 +158,6 @@
 			files = (
 				012C3072226FD13B00BADEF9 /* LaunchScreen.storyboard in Resources */,
 				012C306F226FD13B00BADEF9 /* Assets.xcassets in Resources */,
-				A9A7C756227E1D6200F2CC59 /* README.md in Resources */,
 				012C306D226FD13B00BADEF9 /* Main.storyboard in Resources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -381,7 +367,7 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		012C305F226FD13B00BADEF9 /* Build configuration list for PBXProject "CoreBluetoothLESample" */ = {
+		012C305F226FD13B00BADEF9 /* Build configuration list for PBXProject "BLE-Chess" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				012C3074226FD13B00BADEF9 /* Debug */,
@@ -390,7 +376,7 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Release;
 		};
-		012C3076226FD13B00BADEF9 /* Build configuration list for PBXNativeTarget "CoreBluetoothLESample" */ = {
+		012C3076226FD13B00BADEF9 /* Build configuration list for PBXNativeTarget "BLE-Chess" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
 				012C3077226FD13B00BADEF9 /* Debug */,
