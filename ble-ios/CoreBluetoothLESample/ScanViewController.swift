@@ -209,6 +209,9 @@ extension ScanViewController : CBPeripheralDelegate {
     }
     
     func writeData(str_to_write : String) {
+        if let max_mtu = currentPeripheral?.maximumWriteValueLength(for: .withResponse) {
+            os_log("MTU: %d", max_mtu)
+        }
         let d = str_to_write.data(using: .ascii).unsafelyUnwrapped
         currentPeripheral?.writeValue(d, for: transferCharacteristic.unsafelyUnwrapped, type: .withResponse)
     }
