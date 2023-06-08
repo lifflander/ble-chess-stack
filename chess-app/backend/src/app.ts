@@ -67,3 +67,10 @@ app.put("/games/:id", bodyParser.json(), async (req: Request, res: Response): Pr
 app.listen(port, () => {
     return console.log(`Express is listening at http://localhost:${port}`);
 });
+
+app.get("/moves", async (req: Request, res: Response): Promise<Response> => {
+  await ChessMove.sync({force: false});
+  console.log("get all moves");
+  const allmoves: ChessMove[] = await ChessMove.findAll();
+  return res.status(200).json(allmoves);
+});
