@@ -43,7 +43,6 @@ function App() {
     return (
 	<div className="App">
 	    <header className="App-header">
-	    </header>
               <p>
               OK. {message}
               </p>
@@ -53,6 +52,7 @@ function App() {
 	           <button type="submit">Add Game</button>
 	        </form>
 	      </div>
+	    </header>
 	</div>
     );
 }
