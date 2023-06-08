@@ -1,0 +1,46 @@
+version: '3.8'
+
+services:
+    postgres:
+        image: postgres:12.1
+        ports:
+            - "5432:5432"
+        expose:
+            - 5432
+        environment:
+          POSTGRES_PASSWORD: mypassword
+          POSTGRES_USER: postgres
+          POSTGRES_DB: chessgame
+        volumes:
+            - ./postgresql/data:/var/lib/postgresql/data
+
+    backend:
+        build:
+            context: ./backend
+            dockerfile: Dockerfile
+        environment:
+          PSQL_HOST: postgres
+          POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mypassword}
+          POSTGRES_USER: ${POSTGRES_USER:-postgres}
+          POSTGRES_DB: ${POSTGRES_DB:-chessgame}
+        volumes:
+            - /app/node_modules
+            - ./backend/config:/app/config
+            - ./backend/src:/app/src
+            - ./backend/test:/app/test
+        ports:
+            - "5000:5000"
+        expose:
+            - 5000
+
+    ui:
+        build:
+            context: ./chess-ui
+            dockerfile: Dockerfile
+        volumes:
+            - /app/node_modules
+            - ./chess-ui:/app
+        ports:
+            - "3000:3000"
+        expose:
+            - 3000
