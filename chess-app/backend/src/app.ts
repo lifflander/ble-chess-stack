@@ -32,12 +32,14 @@ app.get('/test', (req, res) => {
 });
 
 app.get("/games", async (req: Request, res: Response): Promise<Response> => {
+  await ChessGame.sync({force: false});
   console.log("get all games");
   const allgames: ChessGame[] = await ChessGame.findAll();
   return res.status(200).json(allgames);
 });
 
 app.get("/games/:id", async (req: Request, res: Response): Promise<Response> => {
+  await ChessGame.sync({force: false});
   console.log(`Get request`);
   const { id } = req.params;
   console.log(id);
