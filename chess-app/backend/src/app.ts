@@ -3,7 +3,8 @@ import express, { Request, Response } from 'express';
 import cors from 'cors';
 
 import { Sequelize } from 'sequelize-typescript';
-import { ChessGame } from "./models";
+import { ChessGame } from "./game";
+import { ChessMove } from "./move";
 import bodyParser from 'body-parser'
 
 const app = express();
@@ -20,7 +21,7 @@ const sequelize = new Sequelize({
     password: "mypassword",
     database: "chessgame",
     logging: console.log,
-    models: [ ChessGame]
+    models: [ ChessGame, ChessMove ]
 });
 
 app.get('/', (req, res) => {

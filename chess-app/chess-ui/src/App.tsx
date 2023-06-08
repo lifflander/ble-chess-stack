@@ -43,9 +43,9 @@ function App() {
     return (
 	<div className="App">
 	    <header className="App-header">
-              <img src={logo} className="App-logo" alt="logo" />
+	    </header>
               <p>
-              Edit <code>src/App.tsx</code> and save to reload. OK. {message}
+              OK. {message}
               </p>
 	      <div className="add-game-container">
 	        <form onSubmit={handleSubmit}>
@@ -53,7 +53,6 @@ function App() {
 	           <button type="submit">Add Game</button>
 	        </form>
 	      </div>
-	    </header>
 	</div>
     );
 }
