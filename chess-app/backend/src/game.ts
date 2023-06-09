@@ -9,8 +9,8 @@ import { ChessMove } from './move'
 })
 export class ChessGame extends Model {
     @Column({
-	type: DataType.STRING,
-	allowNull: false,
+        type: DataType.STRING,
+        allowNull: false,
     })
     declare title: string;
 
