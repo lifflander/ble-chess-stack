@@ -41,15 +41,20 @@ function App() {
 		title: title
 	    });
 	    console.log(response)
+	    getGames()
 	} catch (error) {
 	    console.log(error);
 	}
     };
 
-    useEffect(() => {
+    const getGames = () => {
 	client.get('').then(json => setGames(json.data))
+    }
+
+    useEffect(() => {
+	getGames()
     }, [])
-    
+
     const renderTable = () => {
 	return games.map(game => {
 	    return (
