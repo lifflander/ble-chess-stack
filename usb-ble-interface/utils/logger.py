@@ -10,9 +10,9 @@ try:
     import cfg
 except ImportError:
     cfg = SimpleNamespace()
-    cfg.DEBUG = False
-    cfg.DEBUG_LED = False
-    cfg.DEBUG_READING = False
+    cfg.DEBUG = True
+    cfg.DEBUG_LED = True
+    cfg.DEBUG_READING = True
     cfg.APPLICATION = "UNKNOWN"
     cfg.VERSION = "10.04.2020"
     cfg.args = SimpleNamespace()

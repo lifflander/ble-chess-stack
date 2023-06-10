@@ -69,6 +69,7 @@ class BoardReader:
         self.calibration_filepath = os.path.join(
             CERTABO_DATA_PATH, self.calibration_file
         )
+        print(self.calibration_filepath)
         self.code_mapping = {}
         self.load_piece_codes()
         self.cell_slice_mapping = [slice(cell * 5, cell * 5 + 5) for cell in range(64)]

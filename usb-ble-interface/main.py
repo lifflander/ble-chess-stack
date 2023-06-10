@@ -5,6 +5,7 @@ import multiprocessing
 
 from utils.get_moves import get_moves
 from utils import reader_writer, usbtool
+from utils import logger
 
 import chess.pgn
 
@@ -32,19 +33,25 @@ def stateConnecting(state):
     print("stateConnecting")
     assert(state == State.Connecting)
 
+    global CHESSBOARD_CONNECTION_PROCESS
+    global LED_MANAGER
+    global USB_READER
+
     CHESSBOARD_CONNECTION_PROCESS = usbtool.start_usbtool(
         CONNECTION_ADDRESS, separate_process=True
     )
 
+    waitFor(seconds=1)
+
     while usbtool.QUEUE_FROM_USBTOOL.empty():
         # Wait for connection
-        waitFor(seconds=0.1)
+        waitFor(seconds=1)
 
-    USB_READER = reader_writer.BoardReader(CONNECTION_ADDRESS)
+    USB_READER = reader_writer.BoardReader(usbtool.find_address())
     LED_MANAGER = reader_writer.LedWriter()
 
     LED_MANAGER.set_leds("all")
-    waitFor(seconds=1)
+    waitFor(seconds=3)
     LED_MANAGER.set_leds()
 
     if USB_READER.needs_calibration:
@@ -54,10 +61,11 @@ def stateConnecting(state):
 
 def stateCalibrating(state):
     print("stateCalibrating")
-    assert(state == State.Calibrating)
+    assert(state == State.Calibration)
 
-    while not USB_READER.calibration(True):
+    while not USB_READER.calibration(True, True):
         print("Trying to calibrate")
+        waitFor(seconds=1)
 
     return State.NewGame
 
@@ -71,9 +79,14 @@ def stateNewGame(state):
 
     VIRTUAL_BOARD = chess.Board()
 
+    print("about to spin")
     while VIRTUAL_BOARD.board_fen() != current_fen:
+        LED_MANAGER.set_leds("all")
+        print("spinning", current_fen)
         current_fen = USB_READER.read_board(update=True)
+        waitFor(seconds=1)
 
+    print("done")
     LED_MANAGER.set_leds("")
 
     PHYSICAL_BORAD_FEN = current_fen
@@ -117,14 +130,15 @@ def stateWaitingForInput(state):
     return state.WaitingForInput
 
 if __name__ == "__main__":
-    multiprocessing.freeze_support()
+    #multiprocessing.freeze_support()
+    logger.set_logger()
 
     s = State.Connecting
 
     while s != State.EndOfGame:
         if s == State.Connecting:
             s = stateConnecting(s)
-        elif s == State.Calibrating:
+        elif s == State.Calibration:
             s = stateCalibrating(s)
         elif s == State.NewGame:
             s = stateNewGame(s)
