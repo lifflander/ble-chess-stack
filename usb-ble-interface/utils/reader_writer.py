@@ -188,6 +188,10 @@ class BoardReader:
 
         if rotate180:
             return self.board_fen[::-1]
+
+        # log.debug(
+        #     f"UsbReader: Computing FEN -> current board - {self.board_fen} "
+        # )
         return self.board_fen
 
     def do_calibration(self, new_setup, verbose=False):
@@ -335,13 +339,13 @@ class LedWriter:
         self.full_leds = None
         self.blink_leds = None
 
-        self.flash_frequency = 1  # seconds
+        self.flash_frequency = 0.1  # seconds
         self.flash_timer = 0
         self.counter = 0
 
         self.last_misplaced_comparison = None
         self.last_misplaced_message = None
-        self.misplaced_wait_time = 3  # seconds
+        self.misplaced_wait_time = 0.3  # seconds
         self.misplaced_clock = None
 
     def set_leds(self, message="none", rotate180=False):
@@ -428,7 +432,7 @@ class LedWriter:
                 log.debug(f"LedManager: sending to usbtool - {leds}, {len(leds)}")
             self.last_leds = leds
             self.queue_to_usbtool.put(bytes(leds))
-            time.sleep(0.001)
+            time.sleep(0.1)
 
     @staticmethod
     def squares2led(squares, rotate180=False):

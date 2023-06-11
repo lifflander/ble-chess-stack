@@ -47,8 +47,8 @@ function App() {
         }
     };
 
-    const getGames = () => {
-        client.get('').then(json => setGames(json.data))
+    const getGames = async () => {
+        await client.get('').then(json => setGames(json.data))
     }
 
     useEffect(() => {

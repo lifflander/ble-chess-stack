@@ -35,13 +35,13 @@ parser.add_argument("--multiprocessing-fork", nargs="*")
 
 args = parser.parse_args()
 
-DEBUG = True
-DEBUG_LED = True
+DEBUG = False
+DEBUG_LED = False
 DEBUG_PYSTOCKFISH = True
 DEBUG_READING = True
 DEBUG_ANALYSIS = True
 DEBUG_PYGAME = True
-DEBUG_FPS = True
+DEBUG_FPS = False
 if args.debug is not None:
     DEBUG = True
     for narg in args.debug:
