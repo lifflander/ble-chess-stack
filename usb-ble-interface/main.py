@@ -160,11 +160,6 @@ if __name__ == "__main__":
                 VIRTUAL_BOARD, new_fen, check_double_moves=True
             )
 
-            # print(moves)
-            # print(new_fen)
-
-        LED_MANAGER.set_leds();
-
         print("OUT OF LOOP: ", new_fen)
 
         for move in moves:
