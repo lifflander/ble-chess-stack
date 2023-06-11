@@ -11,9 +11,8 @@ def get_moves(virtual_board, physical_fen, check_double_moves=False):
     # except KeyError:
     #     pass
 
-    copy_board = virtual_board.copy()
-    moves = list(virtual_board.generate_legal_moves())
-    for move in moves:
+    copy_board = virtual_board.copy(stack=False)
+    for move in copy_board.generate_legal_moves():
         copy_board.push(move)
         if physical_fen == copy_board.board_fen():
             result = [move.uci()]
@@ -22,10 +21,9 @@ def get_moves(virtual_board, physical_fen, check_double_moves=False):
         copy_board.pop()
 
     if check_double_moves:
-        for move in moves:
+        for move in copy_board.generate_legal_moves():
             copy_board.push(move)
-            legal_moves2 = list(copy_board.generate_legal_moves())
-            for move2 in legal_moves2:
+            for move2 in copy_board.generate_legal_moves():
                 copy_board.push(move2)
                 if physical_fen == copy_board.board_fen():
                     result = [move.uci(), move2.uci()]
