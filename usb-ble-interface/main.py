@@ -16,6 +16,7 @@ class State(Enum):
     NewGame = 4
     WaitingForInput = 5
     EndOfGame = 6
+    Done = 7
 
 
 if __name__ == "__main__":
@@ -28,7 +29,7 @@ if __name__ == "__main__":
     USB_READER = None
     LED_MANAGER = None
     VIRTUAL_BOARD = None
-    PHYSICAL_BORAD_FEN = None
+    LAST_MOVE = None
 
     def waitFor(seconds):
         time.sleep(seconds)
@@ -81,7 +82,6 @@ if __name__ == "__main__":
         assert(state == State.NewGame)
 
         global VIRTUAL_BOARD
-        global PHYSICAL_BOARD_FEN
 
         LED_MANAGER.set_leds("corners")
 
@@ -99,20 +99,20 @@ if __name__ == "__main__":
 
         LED_MANAGER.set_leds()
 
-        PHYSICAL_BORAD_FEN = current_fen
-
         return State.WaitingForInput
 
     def stateWaitingForInput(state):
         print("stateWaitingForInput")
         assert(state == State.WaitingForInput)
 
-        global PHYSICAL_BOARD_FEN
+        global LAST_MOVE
 
         # It's checkmate or a repetition
         if VIRTUAL_BOARD.is_game_over():
             LED_MANAGER.set_leds("center")
             return state.EndOfGame
+
+        check_squares = []
 
         if VIRTUAL_BOARD.is_check():
             checked_king_square = chess.SQUARE_NAMES[
@@ -121,6 +121,9 @@ if __name__ == "__main__":
             LED_MANAGER.set_leds(
                 checked_king_square
             )
+            check_squares.append(checked_king_square)
+        elif LAST_MOVE:
+            LED_MANAGER.set_leds(LAST_MOVE)
 
 
         new_fen = USB_READER.read_board()
@@ -140,9 +143,15 @@ if __name__ == "__main__":
                 LED_MANAGER.highlight_misplaced_pieces(
                     new_fen,
                     VIRTUAL_BOARD,
-                    False
+                    False,
+                    False,
+                    True
                 )
             )
+
+            if not highligted_leds and LAST_MOVE:
+                LED_MANAGER.set_leds(LAST_MOVE + check_squares)
+
             new_fen = USB_READER.read_board(update=True)
 
             moves = get_moves(
@@ -154,21 +163,38 @@ if __name__ == "__main__":
 
         LED_MANAGER.set_leds();
 
-        print("OUT OF LOOP")
+        print("OUT OF LOOP: ", new_fen)
 
         for move in moves:
             VIRTUAL_BOARD.push_uci(move)
             p1 = move[0] + move[1]
             p2 = move[2] + move[3]
             LED_MANAGER.set_leds([p1, p2])
+            LAST_MOVE = [p1, p2]
             # This is where we update the bluetooth component
             # BLUETOOTH_QUEUE.put(move)
 
         return state.WaitingForInput
 
+    def stateEndOfGame(state):
+        print("stateEndOfGame")
+        LED_MANAGER.set_leds("thinking");
+
+        VIRTUAL_BOARD = chess.Board()
+
+        current_fen = USB_READER.read_board()
+
+        print("about to spin")
+        while VIRTUAL_BOARD.board_fen() != current_fen:
+            print("spinning", current_fen)
+            current_fen = USB_READER.read_board(update=True)
+            waitFor(seconds=1)
+
+        return State.NewGame
+
     s = State.Connecting
 
-    while s != State.EndOfGame:
+    while s != State.Done:
         if s == State.Connecting:
             s = stateConnecting(s)
         elif s == State.Calibration:
@@ -177,3 +203,5 @@ if __name__ == "__main__":
             s = stateNewGame(s)
         elif s == State.WaitingForInput:
             s = stateWaitingForInput(s)
+        elif s == State.EndOfGame:
+            s = stateEndOfGame(s)

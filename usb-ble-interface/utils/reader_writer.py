@@ -345,7 +345,7 @@ class LedWriter:
 
         self.last_misplaced_comparison = None
         self.last_misplaced_message = None
-        self.misplaced_wait_time = 0.3  # seconds
+        self.misplaced_wait_time = 1  # seconds
         self.misplaced_clock = None
 
     def set_leds(self, message="none", rotate180=False):
