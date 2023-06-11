@@ -71,9 +71,11 @@ if __name__ == "__main__":
         print("stateCalibrating")
         assert(state == State.Calibration)
 
-        while not USB_READER.calibration(True, True):
+        USB_READER.read_board(update=True)
+
+        while not USB_READER.calibration(new_setup=True, verbose=True):
             print("Trying to calibrate")
-            waitFor(seconds=1)
+            USB_READER.read_board(update=True)
 
         return State.NewGame
 
