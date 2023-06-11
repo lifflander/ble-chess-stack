@@ -127,8 +127,19 @@ if __name__ == "__main__":
         elif LAST_MOVE:
             LED_MANAGER.set_leds(LAST_MOVE)
 
-        while not USB_READER.board_changed():
-            pass
+
+        ret = USB_READER.update_find_move()
+        while not ret:
+            ret = USB_READER.update_find_move()
+
+        if VIRTUAL_BOARD.is_legal(chess.Move.from_uci(ret[0] + ret[1])):
+            VIRTUAL_BOARD.push_uci(ret[0] + ret[1])
+            LED_MANAGER.set_leds(ret)
+            LAST_MOVE = ret
+            return state.WaitingForInput
+
+        # while not USB_READER.board_changed():
+        #     pass
 
         new_fen = USB_READER.read_board(update=False)
 

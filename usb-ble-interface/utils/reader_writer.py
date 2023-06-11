@@ -73,6 +73,7 @@ class BoardReader:
         self.code_mapping = {}
         self.load_piece_codes()
         self.cell_slice_mapping = [slice(cell * 5, cell * 5 + 5) for cell in range(64)]
+        self.previous_board = []
 
     def load_piece_codes(self):
         mapping = {}
@@ -109,6 +110,8 @@ class BoardReader:
 
             board.append(most_common_code)
             self.counter.clear()
+
+        self.previous_board = board
 
         def board_to_fen(board, ignore_unknown):
             # Convert to FEN
@@ -184,6 +187,98 @@ class BoardReader:
                 return False
 
         return changed
+
+    def try_detect_move(self):
+        data_history = [data[1:].split(" ") for data in self.data_history if data]
+        # Get board pieces from USB data
+        board = []
+        for cell_range in self.cell_slice_mapping:
+            sample = (
+                self.code_mapping.get(tuple(sample[cell_range]), "?")
+                for sample in data_history
+            )
+            self.counter.update(sample)
+            most_common_code, most_common_counts = self.counter.most_common(1)[0]
+            # If unknown readings are not reliable, consider them empty squares
+            if most_common_code == "?" and most_common_counts < self.data_history_depth:
+                most_common_code = "."
+
+            board.append(most_common_code)
+            self.counter.clear()
+
+        num_diffs = 0
+        i1 = ""
+        i2 = ""
+        iv1 = 0
+        iv2 = 0
+
+        for i in range(len(board)):
+            if board[i] != self.previous_board[i]:
+                # print("codes: ", i, board[i], self.previous_board[i])
+                num_diffs += 1
+
+                if num_diffs == 1:
+                    if board[i] != ".":
+                        i1 = board[i]
+                    elif self.previous_board[i] != ".":
+                        i1 = self.previous_board[i]
+                    iv1 = i
+                if num_diffs == 2:
+                    if board[i] != ".":
+                        i2 = board[i]
+                    elif self.previous_board[i] != ".":
+                        i2 = self.previous_board[i]
+                    iv2 = i
+
+        s1 = COLUMNS_LETTERS[iv1 % 8] + str(8 - iv1 // 8)
+        s2 = COLUMNS_LETTERS[iv2 % 8] + str(8 - iv2 // 8)
+
+        # print("diffs=", num_diffs)
+
+        if num_diffs == 2:
+            # print("found a diff of 2: ", s2, s1)
+
+            self.previous_board = board
+            return [s2, s1]
+        else:
+            return None
+
+    def update_find_move(self):
+        # TODO: Add timer and log when board cannot be read for too long
+        changed = False
+        new_data = False
+        while True:
+            try:
+                data = self.queue.get_nowait()
+                new_data = True
+
+                # Check if data stream is different than any other saved in the history
+                for _ in range(self.data_history_depth):
+
+                    self.data_history_pointer += 1
+                    if self.data_history_pointer >= self.data_history_depth:
+                        self.data_history_pointer = 0
+
+                    if not self.data_history[self.data_history_pointer] == data:
+                        # If it is replace it, and break out of loop to avoid
+                        # rewriting more than one entry in the history
+                        self.data_history[self.data_history_pointer] = data
+                        changed = True
+                        break
+
+            except queue.Empty:
+                if new_data:
+                    # This is used for calibration, to know when a new sample was obtained
+                    self.data_history_counter = (
+                        self.data_history_counter + 1
+                    ) % 64  # Limit number range to 64 values
+
+                if changed:
+                    return self.try_detect_move()
+                return None
+
+        return None
+
 
     def read_board(self, rotate180=False, update=True):
         if update:
