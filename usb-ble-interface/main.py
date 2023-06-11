@@ -95,7 +95,7 @@ if __name__ == "__main__":
         while VIRTUAL_BOARD.board_fen() != current_fen:
             print("spinning", current_fen)
             current_fen = USB_READER.read_board(update=True)
-            waitFor(seconds=1)
+            waitFor(seconds=0.2)
 
         print("done")
 
@@ -104,7 +104,7 @@ if __name__ == "__main__":
         return State.WaitingForInput
 
     def stateWaitingForInput(state):
-        print("stateWaitingForInput")
+        # print("stateWaitingForInput")
         assert(state == State.WaitingForInput)
 
         global LAST_MOVE
@@ -127,8 +127,10 @@ if __name__ == "__main__":
         elif LAST_MOVE:
             LED_MANAGER.set_leds(LAST_MOVE)
 
+        while not USB_READER.board_changed():
+            pass
 
-        new_fen = USB_READER.read_board()
+        new_fen = USB_READER.read_board(update=False)
 
         # print("legal moves: ", list(VIRTUAL_BOARD.generate_legal_moves()))
 
@@ -136,7 +138,7 @@ if __name__ == "__main__":
             VIRTUAL_BOARD, new_fen, check_double_moves=True
         )
 
-        print(moves)
+        misplaced_pieces = False
 
         while not moves:
             # waitFor(seconds=1)
@@ -147,25 +149,39 @@ if __name__ == "__main__":
                     VIRTUAL_BOARD,
                     False,
                     False,
-                    True
+                    False
                 )
             )
+
+            if highligted_leds:
+                misplaced_pieces = True
 
             if not highligted_leds and LAST_MOVE:
                 LED_MANAGER.set_leds(LAST_MOVE + check_squares)
 
-            new_fen = USB_READER.read_board(update=True)
+            if not misplaced_pieces:
+                while not USB_READER.board_changed():
+                    pass
 
-            moves = get_moves(
-                VIRTUAL_BOARD, new_fen, check_double_moves=True
-            )
+                new_fen = USB_READER.read_board(update=False)
 
-        print("OUT OF LOOP: ", new_fen)
+                moves = get_moves(
+                    VIRTUAL_BOARD, new_fen, check_double_moves=True
+                )
+            else:
+                new_fen = USB_READER.read_board(update=True)
+
+                moves = get_moves(
+                    VIRTUAL_BOARD, new_fen, check_double_moves=True
+                )
+
+        # print("OUT OF LOOP: ", new_fen)
 
         for move in moves:
             VIRTUAL_BOARD.push_uci(move)
             p1 = move[0] + move[1]
             p2 = move[2] + move[3]
+            # print("sending to leds: ", p1, p2)
             LED_MANAGER.set_leds([p1, p2])
             LAST_MOVE = [p1, p2]
             # This is where we update the bluetooth component

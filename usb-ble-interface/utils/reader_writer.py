@@ -180,7 +180,10 @@ class BoardReader:
 
                 if changed:
                     self.data_to_fen()
-                return
+                    return True
+                return False
+
+        return changed
 
     def read_board(self, rotate180=False, update=True):
         if update:
@@ -193,6 +196,10 @@ class BoardReader:
         #     f"UsbReader: Computing FEN -> current board - {self.board_fen} "
         # )
         return self.board_fen
+
+    def board_changed(self):
+        return self.update()
+
 
     def do_calibration(self, new_setup, verbose=False):
         # STEP 1) Combine data and find most common codes per cell
