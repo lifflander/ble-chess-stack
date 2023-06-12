@@ -59,7 +59,7 @@ def write_request(
     trigger.set()
 
 async def server(loop):
-    my_service_name = "TestXXX"
+    my_service_name = "NewService"
     server = BlessServer(name=my_service_name, loop=loop)
     server.read_request_func = read_request
     server.write_request_func = write_request
@@ -86,19 +86,35 @@ async def server(loop):
     print("Advertising")
     print(f"Write '0xF' to the advertised characteristic: {char_uuid}")
 
+    while not await server.is_connected():
+        await asyncio.sleep(0.1)
+
+    print("someone is subscribing")
+
+    first_time = True
 
     while True:
-        trigger.wait()
         await asyncio.sleep(0.1)
         print("Updating")
+
         c = server.get_characteristic(char_uuid)
-        cur_val = c.value
-        c.value = cur_val.extend(b' ok')
+
+        if first_time:
+            c.value = b'hello there'
+        else:
+            trigger.wait()
+            cur_val = c.value
+            c.value = cur_val.extend(b' ok')
         ret = server.update_value(
             service_uuid, char_uuid #"51FF12BB-3ED8-46E5-B4F9-D64E2FEC021B"
         )
         print(f"ret = {ret}")
-        trigger.clear()
+        await asyncio.sleep(0.3)
+
+        if first_time:
+            first_time = False
+        else:
+            trigger.clear()
 
     # trigger.wait()
     # await asyncio.sleep(2)
@@ -112,6 +128,7 @@ async def server(loop):
     await asyncio.sleep(500)
     # await server.stop()
 
-loop = asyncio.get_event_loop()
+loop = asyncio.new_event_loop()
+asyncio.set_event_loop(loop)
 loop.run_until_complete(server(loop))
 
