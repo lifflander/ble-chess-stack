@@ -49,7 +49,7 @@ if __name__ == "__main__":
             CONNECTION_ADDRESS, separate_process=True
         )
 
-        waitFor(seconds=1)
+        waitFor(seconds=0.3)
 
         while usbtool.QUEUE_FROM_USBTOOL.empty():
             # Wait for connection
@@ -85,6 +85,7 @@ if __name__ == "__main__":
         assert(state == State.NewGame)
 
         global VIRTUAL_BOARD
+        global LAST_MOVE
 
         LAST_MOVE = None
 
@@ -101,7 +102,6 @@ if __name__ == "__main__":
             waitFor(seconds=0.2)
 
         print("done")
-
         LED_MANAGER.set_leds()
 
         return State.WaitingForInput
@@ -113,8 +113,19 @@ if __name__ == "__main__":
         global LAST_MOVE
 
         # It's checkmate or a repetition
-        if VIRTUAL_BOARD.is_game_over():
-            LED_MANAGER.set_leds("center")
+        outcome = VIRTUAL_BOARD.outcome(claim_draw=False)
+        if outcome != None:
+            USB_READER.data_to_fen()
+
+            if outcome.winner == chess.WHITE:
+                LED_MANAGER.set_leds(["d3", "d4", "e3", "e4"])
+                print("winner white")
+            elif  outcome.winner == chess.BLACK:
+                LED_MANAGER.set_leds(["d5", "d6", "e5", "e6"])
+                print("winner black")
+            else:
+                LED_MANAGER.set_leds("center")
+
             return state.EndOfGame
 
         check_squares = []
@@ -124,12 +135,11 @@ if __name__ == "__main__":
                 VIRTUAL_BOARD.king(VIRTUAL_BOARD.turn)
             ]
             LED_MANAGER.set_leds(
-                checked_king_square
+                LAST_MOVE + [checked_king_square]
             )
             check_squares.append(checked_king_square)
         elif LAST_MOVE:
             LED_MANAGER.set_leds(LAST_MOVE)
-
 
         ret = USB_READER.update_find_move()
         while ret == None:
@@ -208,17 +218,23 @@ if __name__ == "__main__":
 
     def stateEndOfGame(state):
         print("stateEndOfGame")
-        LED_MANAGER.set_leds("thinking");
+
+        global LAST_MOVE
+        global VIRTUAL_BOARD
 
         VIRTUAL_BOARD = chess.Board()
+        LAST_MOVE = None
 
-        current_fen = USB_READER.read_board()
+        current_fen = USB_READER.read_board(update=True)
 
         print("about to spin")
         while VIRTUAL_BOARD.board_fen() != current_fen:
             print("spinning", current_fen)
             current_fen = USB_READER.read_board(update=True)
-            waitFor(seconds=1)
+            waitFor(seconds=0.2)
+
+        print("pieces are back")
+        LED_MANAGER.set_leds()
 
         return State.NewGame
 
