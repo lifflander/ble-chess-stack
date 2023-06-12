@@ -1,3 +1,5 @@
+
+from enum import Enum, unique, Flag
 import os
 import pickle
 import queue
@@ -28,6 +30,23 @@ COLUMNS_LETTERS_REVERSED = tuple(reversed(COLUMNS_LETTERS))
 
 
 log = get_logger()
+
+@unique
+class Piece(Enum):
+    Pawn    = 1,
+    Rook    = 2,
+    Knight  = 3,
+    Bishop  = 4,
+    King    = 5,
+    Queen   = 6,
+    WPawn   = 7,
+    WRook   = 8,
+    WKnight = 9,
+    WBishop = 10,
+    WKing   = 11,
+    WQueen  = 12,
+    Empty   = 13,
+    Unknown = 14
 
 
 class BoardReader:
@@ -189,9 +208,17 @@ class BoardReader:
         return changed
 
     def try_detect_move(self):
+        print("try_detect_move")
+
         data_history = [data[1:].split(" ") for data in self.data_history if data]
         # Get board pieces from USB data
-        board = []
+
+        i = 0
+        num_diffs = 0
+        i1, i2 = "", ""
+        iv1, iv2 = 0, 0
+        updates = []
+
         for cell_range in self.cell_slice_mapping:
             sample = (
                 self.code_mapping.get(tuple(sample[cell_range]), "?")
@@ -203,44 +230,45 @@ class BoardReader:
             if most_common_code == "?" and most_common_counts < self.data_history_depth:
                 most_common_code = "."
 
-            board.append(most_common_code)
-            self.counter.clear()
+            #board.append(most_common_code)
 
-        num_diffs = 0
-        i1 = ""
-        i2 = ""
-        iv1 = 0
-        iv2 = 0
+            code = most_common_code
 
-        for i in range(len(board)):
-            if board[i] != self.previous_board[i]:
-                # print("codes: ", i, board[i], self.previous_board[i])
+            if code != self.previous_board[i]:
+                updates.append((i, code))
                 num_diffs += 1
 
                 if num_diffs == 1:
-                    if board[i] != ".":
-                        i1 = board[i]
+                    if code != ".":
+                        i1 = code
                     elif self.previous_board[i] != ".":
                         i1 = self.previous_board[i]
                     iv1 = i
                 if num_diffs == 2:
-                    if board[i] != ".":
-                        i2 = board[i]
+                    if code != ".":
+                        i2 = code
                     elif self.previous_board[i] != ".":
                         i2 = self.previous_board[i]
                     iv2 = i
 
+            self.counter.clear()
+
+            i += 1
+
         s1 = COLUMNS_LETTERS[iv1 % 8] + str(8 - iv1 // 8)
         s2 = COLUMNS_LETTERS[iv2 % 8] + str(8 - iv2 // 8)
 
-        # print("diffs=", num_diffs)
-
         if num_diffs == 2:
-            # print("found a diff of 2: ", s2, s1)
+            print("found a diff of 2: ", s2, s1)
 
-            self.previous_board = board
+            for u in updates:
+                self.previous_board[u[0]] = u[1]
+
+            print("try_detect_move returning")
+
             return [s2, s1]
         else:
+            print("try_detect_move returning None")
             return None
 
     def update_find_move(self):
