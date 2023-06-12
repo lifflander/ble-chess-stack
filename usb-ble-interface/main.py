@@ -6,6 +6,8 @@ from utils.get_moves import get_moves
 from utils import reader_writer, usbtool
 from utils import logger
 
+from ble_tool import startBLETool
+
 import chess.pgn
 
 @unique
@@ -30,6 +32,7 @@ if __name__ == "__main__":
     LED_MANAGER = None
     VIRTUAL_BOARD = None
     LAST_MOVE = None
+    QUEUE = None
 
     def waitFor(seconds):
         time.sleep(seconds)
@@ -42,6 +45,7 @@ if __name__ == "__main__":
         global CHESSBOARD_CONNECTION_PROCESS
         global USB_READER
         global LED_MANAGER
+        global QUEUE
 
         CONNECTION_ADDRESS = usbtool.find_address()
 
@@ -57,6 +61,8 @@ if __name__ == "__main__":
 
         USB_READER = reader_writer.BoardReader(CONNECTION_ADDRESS)
         LED_MANAGER = reader_writer.LedWriter()
+
+        QUEUE = startBLETool()
 
         LED_MANAGER.set_leds("all")
         waitFor(seconds=1)
@@ -111,6 +117,7 @@ if __name__ == "__main__":
         assert(state == State.WaitingForInput)
 
         global LAST_MOVE
+        global QUEUE
 
         # It's checkmate or a repetition
         outcome = VIRTUAL_BOARD.outcome(claim_draw=False)
@@ -152,6 +159,9 @@ if __name__ == "__main__":
             VIRTUAL_BOARD.push_uci(ret[0] + ret[1])
             LED_MANAGER.set_leds(ret)
             LAST_MOVE = ret
+
+            QUEUE.put(bytes(ret[0]+ret[1], 'utf-8'))
+
             return state.WaitingForInput
 
         # while not USB_READER.board_changed():
@@ -211,8 +221,8 @@ if __name__ == "__main__":
             # print("sending to leds: ", p1, p2)
             LED_MANAGER.set_leds([p1, p2])
             LAST_MOVE = [p1, p2]
-            # This is where we update the bluetooth component
-            # BLUETOOTH_QUEUE.put(move)
+
+            QUEUE.put(bytes(p1+p2, 'utf-8'))
 
         return state.WaitingForInput
 
