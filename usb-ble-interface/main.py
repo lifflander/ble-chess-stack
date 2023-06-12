@@ -74,8 +74,9 @@ if __name__ == "__main__":
         USB_READER.read_board(update=True)
 
         while not USB_READER.calibration(new_setup=True, verbose=True):
-            print("Trying to calibrate")
+            # print("Trying to calibrate")
             USB_READER.read_board(update=True)
+            # waitFor(seconds=0.5)
 
         return State.NewGame
 
@@ -84,6 +85,8 @@ if __name__ == "__main__":
         assert(state == State.NewGame)
 
         global VIRTUAL_BOARD
+
+        LAST_MOVE = None
 
         LED_MANAGER.set_leds("corners")
 
@@ -129,10 +132,13 @@ if __name__ == "__main__":
 
 
         ret = USB_READER.update_find_move()
-        while not ret:
+        while ret == None:
             ret = USB_READER.update_find_move()
 
+        # print("ret=", ret)
+
         if VIRTUAL_BOARD.is_legal(chess.Move.from_uci(ret[0] + ret[1])):
+            print("moving on")
             VIRTUAL_BOARD.push_uci(ret[0] + ret[1])
             LED_MANAGER.set_leds(ret)
             LAST_MOVE = ret

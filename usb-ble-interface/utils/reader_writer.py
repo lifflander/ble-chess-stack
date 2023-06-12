@@ -1,5 +1,5 @@
 
-from enum import Enum, unique, Flag
+from enum import IntEnum, unique, Flag
 import os
 import pickle
 import queue
@@ -32,21 +32,53 @@ COLUMNS_LETTERS_REVERSED = tuple(reversed(COLUMNS_LETTERS))
 log = get_logger()
 
 @unique
-class Piece(Enum):
-    Pawn    = 1,
-    Rook    = 2,
-    Knight  = 3,
-    Bishop  = 4,
-    King    = 5,
-    Queen   = 6,
-    WPawn   = 7,
-    WRook   = 8,
-    WKnight = 9,
-    WBishop = 10,
-    WKing   = 11,
-    WQueen  = 12,
-    Empty   = 13,
+class Piece(IntEnum):
+    p = 1,
+    r = 2,
+    n = 3,
+    b = 4,
+    k = 5,
+    q = 6,
+    P = 7,
+    R = 8,
+    N = 9,
+    B = 10,
+    K = 11,
+    Q  = 12,
+    Empty = 13,
     Unknown = 14
+
+def pieceToStr(p : Piece):
+    if p == Piece.Empty:
+        return "."
+    elif p == Piece.Unknown:
+        return "?"
+    elif p == Piece.p:
+        return "p"
+    elif p == Piece.r:
+        return "r"
+    elif p == Piece.n:
+        return "n"
+    elif p == Piece.b:
+        return "b"
+    elif p == Piece.k:
+        return "k"
+    elif p == Piece.q:
+        return "q"
+    elif p == Piece.P:
+        return "P"
+    elif p == Piece.R:
+        return "R"
+    elif p == Piece.N:
+        return "N"
+    elif p == Piece.B:
+        return "B"
+    elif p == Piece.K:
+        return "K"
+    elif p == Piece.Q:
+        return "Q"
+    else:
+        print("error", p)
 
 
 class BoardReader:
@@ -69,18 +101,18 @@ class BoardReader:
 
         self.needs_calibration = False
         self.code_mapping_order = (
-            "p",
-            "r",
-            "n",
-            "b",
-            "k",
-            "q",
-            "P",
-            "R",
-            "N",
-            "B",
-            "K",
-            "Q",
+            Piece.p,
+            Piece.r,
+            Piece.n,
+            Piece.b,
+            Piece.k,
+            Piece.q,
+            Piece.P,
+            Piece.R,
+            Piece.N,
+            Piece.B,
+            Piece.K,
+            Piece.Q
         )
         self.calibration_file = (
             f'calibration-{portname.replace("/","").replace(":","")}.bin'
@@ -109,23 +141,25 @@ class BoardReader:
             for piece_variation in piece:
                 key = tuple(str(c) for c in piece_variation)
                 mapping[key] = letter
-        mapping[("0", "0", "0", "0", "0")] = "."
+        print(mapping)
+        mapping[("0", "0", "0", "0", "0")] = Piece.Empty
         self.code_mapping = mapping
 
     def data_to_fen(self):
+        # print("data_to_fen")
         data_history = [data[1:].split(" ") for data in self.data_history if data]
         # Get board pieces from USB data
         board = []
         for cell_range in self.cell_slice_mapping:
             sample = (
-                self.code_mapping.get(tuple(sample[cell_range]), "?")
+                self.code_mapping.get(tuple(sample[cell_range]), Piece.Unknown)
                 for sample in data_history
             )
             self.counter.update(sample)
             most_common_code, most_common_counts = self.counter.most_common(1)[0]
             # If unknown readings are not reliable, consider them empty squares
-            if most_common_code == "?" and most_common_counts < self.data_history_depth:
-                most_common_code = "."
+            if most_common_code == Piece.Unknown and most_common_counts < self.data_history_depth:
+                most_common_code = Piece.Empty
 
             board.append(most_common_code)
             self.counter.clear()
@@ -138,7 +172,9 @@ class BoardReader:
             for row in range(8):
                 empty = 0
                 for col in range(8):
-                    piece = board[row * 8 + col]
+                    # print(board[row * 8 + col])
+                    piece = pieceToStr(board[row * 8 + col])
+                    # print(piece)
 
                     if piece == "." or (ignore_unknown and piece == "?"):
                         empty += 1
@@ -208,7 +244,7 @@ class BoardReader:
         return changed
 
     def try_detect_move(self):
-        print("try_detect_move")
+        # print("try_detect_move")
 
         data_history = [data[1:].split(" ") for data in self.data_history if data]
         # Get board pieces from USB data
@@ -227,8 +263,8 @@ class BoardReader:
             self.counter.update(sample)
             most_common_code, most_common_counts = self.counter.most_common(1)[0]
             # If unknown readings are not reliable, consider them empty squares
-            if most_common_code == "?" and most_common_counts < self.data_history_depth:
-                most_common_code = "."
+            if most_common_code == Piece.Unknown and most_common_counts < self.data_history_depth:
+                most_common_code = Piece.Empty
 
             #board.append(most_common_code)
 
@@ -259,16 +295,19 @@ class BoardReader:
         s2 = COLUMNS_LETTERS[iv2 % 8] + str(8 - iv2 // 8)
 
         if num_diffs == 2:
-            print("found a diff of 2: ", s2, s1)
+            # print("found a diff of 2: ", s2, s1)
 
             for u in updates:
                 self.previous_board[u[0]] = u[1]
 
-            print("try_detect_move returning")
+            # print("try_detect_move updates: ", updates)
 
-            return [s2, s1]
+            if updates[1][1] == Piece.Empty:
+                return [s2, s1]
+            else:
+                return [s1, s2]
         else:
-            print("try_detect_move returning None")
+            # print("try_detect_move returning None")
             return None
 
     def update_find_move(self):
@@ -375,7 +414,7 @@ class BoardReader:
                     log.debug(f"Added new piece {key} with code: {code}")
 
         # Create empty calibration mapping
-        calibration_mapping = {letter: [] for letter in FEN_SPRITE_MAPPING}
+        calibration_mapping = {i: [] for i in range(1, 13)}
 
         # Populate with old info if doing "add_piece"
         if not new_setup:
@@ -388,31 +427,31 @@ class BoardReader:
                 calibration_mapping[piece].append(code_int_list)
 
         for i in range(8):
-            add_mapping("p", 8 + i)
-            add_mapping("P", 48 + i)
+            add_mapping(int(Piece.p), 8 + i)
+            add_mapping(int(Piece.P), 48 + i)
 
-        add_mapping("r", 0)
-        add_mapping("r", 7)
-        add_mapping("R", 56)
-        add_mapping("R", 63)
+        add_mapping(int(Piece.r), 0)
+        add_mapping(int(Piece.r), 7)
+        add_mapping(int(Piece.R), 56)
+        add_mapping(int(Piece.R), 63)
 
-        add_mapping("n", 1)
-        add_mapping("n", 6)
-        add_mapping("N", 57)
-        add_mapping("N", 62)
+        add_mapping(int(Piece.n), 1)
+        add_mapping(int(Piece.n), 6)
+        add_mapping(int(Piece.N), 57)
+        add_mapping(int(Piece.N), 62)
 
-        add_mapping("b", 2)
-        add_mapping("b", 5)
-        add_mapping("B", 58)
-        add_mapping("B", 61)
+        add_mapping(int(Piece.b), 2)
+        add_mapping(int(Piece.b), 5)
+        add_mapping(int(Piece.B), 58)
+        add_mapping(int(Piece.B), 61)
 
-        add_mapping("q", 3)
-        add_mapping("Q", 59)
-        add_mapping("q", 19)  # Spare queen
-        add_mapping("Q", 43)  # Spare queen
+        add_mapping(int(Piece.q), 3)
+        add_mapping(int(Piece.Q), 59)
+        add_mapping(int(Piece.q), 19)  # Spare queen
+        add_mapping(int(Piece.Q), 43)  # Spare queen
 
-        add_mapping("k", 4)
-        add_mapping("K", 60)
+        add_mapping(int(Piece.k), 4)
+        add_mapping(int(Piece.K), 60)
 
         calibration_data = [calibration_mapping[key] for key in self.code_mapping_order]
         with open(self.calibration_filepath, "wb") as file:
