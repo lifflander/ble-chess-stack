@@ -3,14 +3,21 @@ import React, { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import axios from 'axios'
+// import { useHistory } from 'react-router-dom';
 
 const client = axios.create({
-    baseURL: "http://localhost:5000/games" 
+    baseURL: "http://localhost:5000/" 
 });
 
+interface Move {
+    pgn: string
+    gameID : number
+}
+
 interface Game {
-  id: number;
-  title: string;
+    id: number
+    title: string
+    moves: Move[]
 };
 
 function App() {
@@ -25,8 +32,6 @@ function App() {
     }, []);
 
     const [title, setTitle] = useState('');
-    // const [body, setBody] = useState('');
-    // const [posts, setPosts] = useState([]);
 
     const handleSubmit = (e : React.FormEvent<HTMLFormElement> ) => {
         console.log("called submit");
@@ -37,7 +42,7 @@ function App() {
     const addGame = async (title : String) => {
         try {
             console.log("adding game");
-            let response = await client.post('', {
+            let response = await client.post('games', {
                 title: title
             });
             console.log(response)
@@ -48,7 +53,7 @@ function App() {
     };
 
     const getGames = async () => {
-        await client.get('').then(json => setGames(json.data))
+        await client.get('games').then(json => setGames(json.data) )
     }
 
     useEffect(() => {
@@ -56,11 +61,16 @@ function App() {
     }, [])
 
     const renderTable = () => {
-        return games.map(game => {
+        return games.map((game, index : number) => {
+            let move_str : string = game.moves?.map((move : Move) : string => move.pgn).reduce((acc  : string, cur : string) : string => acc + cur, "" as string)
             return (
                 <tr>
                     <td>{game.id}</td>
                     <td>{game.title}</td>
+                    <td>{move_str}</td>
+                    <td>
+                      <a href={"/games/" + game.id}>View</a>
+                    </td>
                 </tr>
             )
         })
@@ -79,15 +89,19 @@ function App() {
                    <button type="submit">Add Game</button>
                 </form>
               </div>
-              <table id="games">
+			  <div className="table-holder">
+              <table id="games" className="table table-sm Table-color">
               <thead>
                 <tr>
                   <th>ID</th>
                   <th>Title</th>
+                  <th>Moves</th>
+                  <th></th>
                 </tr>
               </thead>
               <tbody>{renderTable()}</tbody>
               </table>
+			  </div>
             </header>
         </div>
     );

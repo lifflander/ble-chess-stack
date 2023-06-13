@@ -35,7 +35,7 @@ app.get('/test', (req, res) => {
 app.get("/games", async (req: Request, res: Response): Promise<Response> => {
     await ChessGame.sync({force: false});
     console.log("get all games");
-    const allgames: ChessGame[] = await ChessGame.findAll();
+    const allgames: ChessGame[] = await ChessGame.findAll({include: [ ChessMove ]});
     return res.status(200).json(allgames);
 });
 
@@ -44,7 +44,7 @@ app.get("/games/:id", async (req: Request, res: Response): Promise<Response> => 
     console.log(`Get request`);
     const { id } = req.params;
     console.log(id);
-    const game : ChessGame | null = await ChessGame.findByPk(id);
+    const game : ChessGame | null = await ChessGame.findByPk(id, {include: [ ChessMove ]});
     console.log(game)
     return res.status(200).json(game);
 });
@@ -73,4 +73,20 @@ app.get("/moves", async (req: Request, res: Response): Promise<Response> => {
     console.log("get all moves");
     const allmoves: ChessMove[] = await ChessMove.findAll();
     return res.status(200).json(allmoves);
+});
+
+app.get("/moves/:gameid", async (req: Request, res: Response): Promise<Response> => {
+    await ChessMove.sync({force: false});
+    const { gameid } = req.params;
+    console.log("get moves for game");
+    const allmoves : ChessMove[] = await ChessMove.findAll({where: { gameID: gameid }})
+    return res.status(200).json(allmoves);
+});
+
+app.post("/moves", bodyParser.json(), async (req: Request, res: Response): Promise<Response> => {
+    console.log(req.body)
+    // return res.json(req.body);
+    // await console.log(req.body)
+    const game: ChessMove = await ChessMove.create({ ...req.body });
+    return res.status(201).json(game);
 });
