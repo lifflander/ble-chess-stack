@@ -34,6 +34,20 @@
   cursor: pointer;
 }
 
+.moveSpan {
+    margin: 10px;
+}
+
+.moveSelected {
+  color: yellow;
+  text-decoration: none;
+}
+
+.moveSelected:hover {
+  color: yellow;
+  cursor: pointer;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;

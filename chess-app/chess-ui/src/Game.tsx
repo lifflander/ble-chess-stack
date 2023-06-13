@@ -69,6 +69,10 @@ function Game() {
         }
     }
 
+    const getSelectedMoveClass = (moveid : number) : string => {
+        return moveid === curMove ? "moveSelected" : "move"
+    }
+
     const updateMove = (id : number) => {
         setCurMove(id)
         updateDisplayedMoves(game!, id)
@@ -77,10 +81,10 @@ function Game() {
     const renderMoves = () => {
         return game?.moves.map((move : Move, index : number) => {
             return (
-                <tr>
-                    <td scope="row">{move.id}</td>
-                    <td scope="row"><a className="move" onClick={() => updateMove(move.id)}>{move.pgn}</a></td>
-                </tr>
+                <span className="moveSpan">
+                    {move.id}.
+                    <a className={getSelectedMoveClass(move.id)} onClick={() => updateMove(move.id)}>{move.pgn}</a>
+                </span>
             )
         })
     }
@@ -110,16 +114,8 @@ function Game() {
             <header className="App-header">
               GameID: {game?.id}<br/> Title: {game?.title}
               <div>
-              <table id="games" className="table Table-color">
-              <thead>
-                <tr>
-                  <th scope="col">ID</th>
-                  <th scope="col">Move</th>
-                </tr>
-              </thead>
-              <tbody>{renderMoves()}</tbody>
-              </table>
-            </div>
+              {renderMoves()}
+              </div>
             <div className='chess-board'>
             <Chessboard position={chessState.fen()} onPieceDrop={onDrop} />
             </div>
