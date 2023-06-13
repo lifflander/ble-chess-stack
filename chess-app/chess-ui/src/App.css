@@ -20,6 +20,9 @@
 .table-holder {
   width: 75%;
 }
+.chess-board {
+  width: 50%;
+}
 
 .App-header {
   background-color: #282c34;
