@@ -79,8 +79,7 @@ function Game() {
             return (
                 <tr>
                     <td scope="row">{move.id}</td>
-                    <td scope="row">{move.pgn}</td>
-                    <td scope="row"><button onClick={() => updateMove(move.id)}>View</button></td>
+                    <td scope="row"><a className="move" onClick={() => updateMove(move.id)}>{move.pgn}</a></td>
                 </tr>
             )
         })
@@ -116,7 +115,6 @@ function Game() {
                 <tr>
                   <th scope="col">ID</th>
                   <th scope="col">Move</th>
-                  <th scope="col">View</th>
                 </tr>
               </thead>
               <tbody>{renderMoves()}</tbody>

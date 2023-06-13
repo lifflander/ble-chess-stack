@@ -24,6 +24,16 @@
   width: 50%;
 }
 
+.move {
+  color: darkslategray;
+  text-decoration: none;
+}
+
+.move:hover {
+  color: yellow;
+  cursor: pointer;
+}
+
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
