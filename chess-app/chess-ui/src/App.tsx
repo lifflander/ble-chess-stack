@@ -89,7 +89,7 @@ function App() {
                    <button type="submit">Add Game</button>
                 </form>
               </div>
-			  <div className="table-holder">
+	      <div className="table-holder">
               <table id="games" className="table table-sm Table-color">
               <thead>
                 <tr>
@@ -101,7 +101,7 @@ function App() {
               </thead>
               <tbody>{renderTable()}</tbody>
               </table>
-			  </div>
+	    </div>
             </header>
         </div>
     );

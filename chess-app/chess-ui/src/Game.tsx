@@ -32,6 +32,7 @@ interface StateMove {
 
 function Game() {
     const [game, setGame] = useState<Game>()
+    const [curMove, setCurMove] = useState<number>()
     const [chessState, setChessState] = useState<Chess>(new Chess());
 
     let { gameID } = useParams();
@@ -41,7 +42,6 @@ function Game() {
     useEffect(() => {
         if (gameID !== undefined) {
             getGame(+gameID)
-            console.log("running useEffect", gameID)
         }
     }, [])
 
@@ -49,18 +49,29 @@ function Game() {
         await client.get('games/' + id).then(json => {
             setGame(json.data)
             const x = json.data as Game
-            const s : Chess = new Chess()
-            console.log(x.moves)
-            x.moves.map((move) => {
-                s.move({
-                    from: move.pgn.substring(0, 2) as Square,
-                    to: move.pgn.substring(2, 4) as Square,
-                    promotion: "q"
-                })
-            })
-            //console.log(s.fen())
-            setChessState(s)
+            updateDisplayedMoves(x, curMove)
         })
+    }
+
+    const updateDisplayedMoves = (game : Game, moveNum : number = 100000000) => {
+        if (game) {
+            const s : Chess = new Chess()
+            game.moves.map((move) => {
+                if (move.id <= moveNum) {
+                    s.move({
+                        from: move.pgn.substring(0, 2) as Square,
+                        to: move.pgn.substring(2, 4) as Square,
+                        promotion: "q"
+                    })
+                }
+            })
+            setChessState(s)
+        }
+    }
+
+    const updateMove = (id : number) => {
+        setCurMove(id)
+        updateDisplayedMoves(game!, id)
     }
 
     const renderMoves = () => {
@@ -69,6 +80,7 @@ function Game() {
                 <tr>
                     <td scope="row">{move.id}</td>
                     <td scope="row">{move.pgn}</td>
+                    <td scope="row"><button onClick={() => updateMove(move.id)}>View</button></td>
                 </tr>
             )
         })
@@ -84,9 +96,9 @@ function Game() {
 
     const onDrop = (sourceSquare : Square, targetSquare : Square) => {
         const move = makeAMove({
-          from: sourceSquare,
-          to: targetSquare,
-          promotion: "q"
+            from: sourceSquare,
+            to: targetSquare,
+            promotion: "q"
         });
 
         // illegal move
@@ -104,6 +116,7 @@ function Game() {
                 <tr>
                   <th scope="col">ID</th>
                   <th scope="col">Move</th>
+                  <th scope="col">View</th>
                 </tr>
               </thead>
               <tbody>{renderMoves()}</tbody>
