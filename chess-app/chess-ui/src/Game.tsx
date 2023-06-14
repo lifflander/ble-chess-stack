@@ -130,6 +130,24 @@ function Game() {
         return true;
     }
 
+    const outputCurrentState = () => {
+        if (chessState.isStalemate()) {
+            return "Draw -- Stalemate"
+        } else if (chessState.isThreefoldRepetition()) {
+            return "Draw -- 3-fold"
+        } else if (chessState.isInsufficientMaterial()) {
+            return "Draw -- insufficient material"
+        } else if (chessState.isDraw()) {
+            return "Draw"
+        } else if (chessState.isCheckmate()) {
+            return "Checkmate"
+        }  else if (chessState.isCheck()) {
+            return "Check"
+        } else {
+            return "Active"
+        }
+    }
+
     return (
         <div className="Game">
             <header className="App-header">
@@ -140,6 +158,7 @@ function Game() {
             <div className='chess-board'>
             <Chessboard position={chessState.fen()} onPieceDrop={onDrop} />
             </div>
+            {outputCurrentState()}
             </header>
         </div>
     );
