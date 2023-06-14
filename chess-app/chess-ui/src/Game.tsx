@@ -70,8 +70,8 @@ function Game() {
         }
     }
 
-    const getSelectedMoveClass = (moveid : number) : string => {
-        return moveid === curMove ? "moveSelected" : "move"
+    const getSelectedMoveClass = (index : number, cur_move : number) : string => {
+        return index === cur_move ? "moveSelected" : "move"
     }
 
     const updateMove = (index : number) => {
@@ -81,6 +81,7 @@ function Game() {
 
     const getRealPGN = (moves : GameMove[], index : number) : string => {
         const s : Chess = new Chess()
+        // this is not great...
         moves.map((move) => {
             if (move.moveIndex < index) {
                 s.move({
@@ -101,7 +102,7 @@ function Game() {
                 <span className="moveSpan">
                     {(moveIndex-1) % 2 == 0 ? ((moveIndex + 1) / 2).toString() + ". " : ""}
                     <a
-                        className={getSelectedMoveClass(moveIndex)}
+                        className={getSelectedMoveClass(moveIndex, curMove!)}
                         onClick={() => updateMove(moveIndex)}
                     >{getRealPGN(game?.moves, moveIndex)}
                     </a>
