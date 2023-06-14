@@ -91,7 +91,6 @@ function Game() {
             }
         })
         const history : Move[] = s.history({verbose: true})
-        console.log("history:", history)
         return history[history.length-1].san
     }
 
@@ -100,7 +99,7 @@ function Game() {
             const moveIndex = move.moveIndex + 1
             return (
                 <span className="moveSpan">
-                    {moveIndex}.
+                    {(moveIndex-1) % 2 == 0 ? ((moveIndex + 1) / 2).toString() + ". " : ""}
                     <a
                         className={getSelectedMoveClass(moveIndex)}
                         onClick={() => updateMove(moveIndex)}
