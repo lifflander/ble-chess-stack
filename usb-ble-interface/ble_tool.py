@@ -41,7 +41,7 @@ def startBLETool():
     global QUEUE_TO_BLETOOL
 
     logger.debug("Launching BLE tool in separate process")
-    QUEUE_TO_BLETOOL = multiprocessing.Queue(maxsize=64)
+    QUEUE_TO_BLETOOL = multiprocessing.Queue(maxsize=256)
     thread = multiprocessing.Process(
         target=startServer,
         args=(10, QUEUE_TO_BLETOOL),
