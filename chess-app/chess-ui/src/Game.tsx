@@ -35,6 +35,7 @@ function Game() {
     const [game, setGame] = useState<Game>()
     const [curMove, setCurMove] = useState<number>()
     const [chessState, setChessState] = useState<Chess>(new Chess());
+    const [PGNMoves, setPGNMoves] = useState<string[]>([]);
 
     let { gameID } = useParams();
 
@@ -48,9 +49,10 @@ function Game() {
 
     const getGame = async (id : number) => {
         await client.get('games/' + id).then(json => {
-            setGame(json.data)
-            const x = json.data as Game
-            updateDisplayedMoves(x, curMove)
+            const fetched_game = json.data as Game;
+            setGame(fetched_game)
+            updateDisplayedMoves(fetched_game, curMove)
+            setPGNMoves(getPGNs(fetched_game.moves))
         })
     }
 
@@ -79,20 +81,17 @@ function Game() {
         updateDisplayedMoves(game!, index)
     }
 
-    const getRealPGN = (moves : GameMove[], index : number) : string => {
+    const getPGNs = (moves : GameMove[]) : string[] => {
         const s : Chess = new Chess()
-        // this is not great...
         moves.map((move) => {
-            if (move.moveIndex < index) {
-                s.move({
-                    from: move.pgn.substring(0, 2) as Square,
-                    to: move.pgn.substring(2, 4) as Square,
-                    promotion: "q"
-                })
-            }
+            s.move({
+                from: move.pgn.substring(0, 2) as Square,
+                to: move.pgn.substring(2, 4) as Square,
+                promotion: "q"
+            })
         })
         const history : Move[] = s.history({verbose: true})
-        return history[history.length-1].san
+        return history.map((h) => h.san);
     }
 
     const renderMoves = () => {
@@ -104,7 +103,7 @@ function Game() {
                     <a
                         className={getSelectedMoveClass(moveIndex, curMove!)}
                         onClick={() => updateMove(moveIndex)}
-                    >{getRealPGN(game?.moves, moveIndex)}
+                    >{PGNMoves[moveIndex-1]}
                     </a>
                 </span>
             )
