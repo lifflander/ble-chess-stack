@@ -18,6 +18,9 @@ export class ChessMove extends Model {
     @Column
     declare gameID: number;
 
+    @Column
+    declare moveIndex: number;
+
     @BelongsTo(() => ChessGame)
     declare game: ChessGame;
 }

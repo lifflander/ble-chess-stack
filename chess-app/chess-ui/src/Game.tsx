@@ -5,23 +5,24 @@ import logo from './logo.svg';
 import './App.css';
 import axios from 'axios'
 import { Chessboard } from 'react-chessboard'
-import { Chess } from "chess.js";
+import { Chess, Move } from "chess.js";
 import { Square } from 'react-chessboard/dist/chessboard/types';
 
 const client = axios.create({
     baseURL: "http://localhost:5000/"
 });
 
-interface Move {
+interface GameMove {
     id: number
     pgn: string
     gameID : number
+    moveIndex : number
 }
 
 interface Game {
     id: number
     title: string
-    moves: Move[]
+    moves: GameMove[]
 };
 
 interface StateMove {
@@ -57,7 +58,7 @@ function Game() {
         if (game) {
             const s : Chess = new Chess()
             game.moves.map((move) => {
-                if (move.id <= moveNum) {
+                if (move.moveIndex < moveNum) {
                     s.move({
                         from: move.pgn.substring(0, 2) as Square,
                         to: move.pgn.substring(2, 4) as Square,
@@ -73,17 +74,38 @@ function Game() {
         return moveid === curMove ? "moveSelected" : "move"
     }
 
-    const updateMove = (id : number) => {
-        setCurMove(id)
-        updateDisplayedMoves(game!, id)
+    const updateMove = (index : number) => {
+        setCurMove(index)
+        updateDisplayedMoves(game!, index)
+    }
+
+    const getRealPGN = (moves : GameMove[], index : number) : string => {
+        const s : Chess = new Chess()
+        moves.map((move) => {
+            if (move.moveIndex < index) {
+                s.move({
+                    from: move.pgn.substring(0, 2) as Square,
+                    to: move.pgn.substring(2, 4) as Square,
+                    promotion: "q"
+                })
+            }
+        })
+        const history : Move[] = s.history({verbose: true})
+        console.log("history:", history)
+        return history[history.length-1].san
     }
 
     const renderMoves = () => {
-        return game?.moves.map((move : Move, index : number) => {
+        return game?.moves.map((move : GameMove, index : number) => {
+            const moveIndex = move.moveIndex + 1
             return (
                 <span className="moveSpan">
-                    {move.id}.
-                    <a className={getSelectedMoveClass(move.id)} onClick={() => updateMove(move.id)}>{move.pgn}</a>
+                    {moveIndex}.
+                    <a
+                        className={getSelectedMoveClass(moveIndex)}
+                        onClick={() => updateMove(moveIndex)}
+                    >{getRealPGN(game?.moves, moveIndex)}
+                    </a>
                 </span>
             )
         })

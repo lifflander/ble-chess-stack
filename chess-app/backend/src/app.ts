@@ -34,6 +34,7 @@ app.get('/test', (req, res) => {
 
 app.get("/games", async (req: Request, res: Response): Promise<Response> => {
     await ChessGame.sync({force: false});
+    await ChessMove.sync({force: false});
     console.log("get all games");
     const allgames: ChessGame[] = await ChessGame.findAll({include: [ ChessMove ]});
     return res.status(200).json(allgames);
@@ -85,8 +86,10 @@ app.get("/moves/:gameid", async (req: Request, res: Response): Promise<Response>
 
 app.post("/moves", bodyParser.json(), async (req: Request, res: Response): Promise<Response> => {
     console.log(req.body)
+    const newmove = req.body as ChessMove;
     // return res.json(req.body);
     // await console.log(req.body)
-    const game: ChessMove = await ChessMove.create({ ...req.body });
+    const allmoves : ChessMove[] = await ChessMove.findAll({where: { gameID: newmove.gameID }});
+    const game: ChessMove = await ChessMove.create({ ...req.body, moveIndex: allmoves.length });
     return res.status(201).json(game);
 });
