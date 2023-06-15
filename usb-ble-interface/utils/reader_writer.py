@@ -243,7 +243,7 @@ class BoardReader:
 
         return changed
 
-    def try_detect_move(self):
+    def try_detect_move(self, force=False):
         # print("try_detect_move")
 
         data_history = [data[1:].split(" ") for data in self.data_history if data]
@@ -290,6 +290,10 @@ class BoardReader:
             self.counter.clear()
 
             i += 1
+
+        if force:
+            for u in updates:
+                self.previous_board[u[0]] = u[1]
 
         s1 = COLUMNS_LETTERS[iv1 % 8] + str(8 - iv1 // 8)
         s2 = COLUMNS_LETTERS[iv2 % 8] + str(8 - iv2 // 8)

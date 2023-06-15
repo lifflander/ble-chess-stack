@@ -148,26 +148,26 @@ if __name__ == "__main__":
         elif LAST_MOVE:
             LED_MANAGER.set_leds(LAST_MOVE)
 
-        ret = USB_READER.update_find_move()
-        while ret == None:
-            ret = USB_READER.update_find_move()
+        # ret = USB_READER.update_find_move()
+        # while ret == None:
+        #     ret = USB_READER.update_find_move()
 
-        # print("ret=", ret)
+        # # print("ret=", ret)
 
-        if VIRTUAL_BOARD.is_legal(chess.Move.from_uci(ret[0] + ret[1])):
-            print("moving on")
-            VIRTUAL_BOARD.push_uci(ret[0] + ret[1])
-            LED_MANAGER.set_leds(ret)
-            LAST_MOVE = ret
+        # if VIRTUAL_BOARD.is_legal(chess.Move.from_uci(ret[0] + ret[1])):
+        #     print("directly moving on: ", ret[0], ret[1])
+        #     VIRTUAL_BOARD.push_uci(ret[0] + ret[1])
+        #     LED_MANAGER.set_leds(ret)
+        #     LAST_MOVE = ret
 
-            QUEUE.put(bytes(ret[0]+ret[1], 'utf-8'))
+        #     QUEUE.put(bytes(ret[0]+ret[1], 'utf-8'))
 
-            return state.WaitingForInput
+        #     return state.WaitingForInput
 
         # while not USB_READER.board_changed():
         #     pass
 
-        new_fen = USB_READER.read_board(update=False)
+        new_fen = USB_READER.read_board(update=True)
 
         # print("legal moves: ", list(VIRTUAL_BOARD.generate_legal_moves()))
 
@@ -200,13 +200,19 @@ if __name__ == "__main__":
                 while not USB_READER.board_changed():
                     pass
 
-                new_fen = USB_READER.read_board(update=False)
+                new_fen = USB_READER.read_board(update=True)
+
+                # print("legal moves 1: ", list(VIRTUAL_BOARD.generate_legal_moves()))
+                # print("new fen 1:", new_fen)
 
                 moves = get_moves(
                     VIRTUAL_BOARD, new_fen, check_double_moves=True
                 )
             else:
                 new_fen = USB_READER.read_board(update=True)
+
+                # print("legal moves 2: ", list(VIRTUAL_BOARD.generate_legal_moves()))
+                # print("new fen 2:", new_fen)
 
                 moves = get_moves(
                     VIRTUAL_BOARD, new_fen, check_double_moves=True
@@ -215,10 +221,10 @@ if __name__ == "__main__":
         # print("OUT OF LOOP: ", new_fen)
 
         for move in moves:
+            print("pushing move: ", move)
             VIRTUAL_BOARD.push_uci(move)
             p1 = move[0] + move[1]
             p2 = move[2] + move[3]
-            # print("sending to leds: ", p1, p2)
             LED_MANAGER.set_leds([p1, p2])
             LAST_MOVE = [p1, p2]
 
