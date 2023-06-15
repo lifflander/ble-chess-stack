@@ -92,6 +92,9 @@ async def server(loop, queue):
         await asyncio.sleep(0.1)
         print("Updating")
 
+        while not await server.is_connected():
+            await asyncio.sleep(0.1)
+
         message = queue.get()
         print("Got message")
 
