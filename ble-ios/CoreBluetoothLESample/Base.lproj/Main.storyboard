@@ -28,7 +28,7 @@
         <!--View Controller-->
         <scene sceneID="tne-QT-ifu">
             <objects>
-                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="CoreBluetoothLESample" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController id="BYZ-38-t0r" customClass="ViewController" customModule="BLE_Chess" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="8bC-Xf-vdC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -93,7 +93,7 @@
         <!--Central-->
         <scene sceneID="aZ8-7Q-SUs">
             <objects>
-                <viewController title="Central" id="fSl-V7-HRz" customClass="CentralViewController" customModule="CoreBluetoothLESample" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Central" id="fSl-V7-HRz" customClass="CentralViewController" customModule="BLE_Chess" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="7iS-HE-dyC">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -129,7 +129,7 @@
         <!--Peripheral-->
         <scene sceneID="eSo-6h-0jF">
             <objects>
-                <viewController title="Peripheral" id="fAL-1c-sOi" customClass="PeripheralViewController" customModule="CoreBluetoothLESample" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Peripheral" id="fAL-1c-sOi" customClass="PeripheralViewController" customModule="BLE_Chess" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="JLl-HW-WyH">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -182,7 +182,7 @@
         <!--Scan Scene-->
         <scene sceneID="HJz-LD-3Q6">
             <objects>
-                <viewController title="Scan Scene" id="Sbi-rQ-zdb" customClass="ScanViewController" customModule="CoreBluetoothLESample" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController title="Scan Scene" id="Sbi-rQ-zdb" customClass="ScanViewController" customModule="BLE_Chess" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="lDh-4Y-Niv">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -192,7 +192,7 @@
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="listCell" id="wz1-6r-vYM" customClass="CustomCell" customModule="CoreBluetoothLESample" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="listCell" id="wz1-6r-vYM" customClass="CustomCell" customModule="BLE_Chess" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="50" width="343" height="43.666667938232422"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="wz1-6r-vYM" id="heI-I3-XYv">
@@ -253,7 +253,7 @@
         <!--Connect View Controller-->
         <scene sceneID="iGD-wv-7eT">
             <objects>
-                <viewController storyboardIdentifier="ConnectViewController" id="EJf-7F-3KS" customClass="ConnectViewController" customModule="CoreBluetoothLESample" customModuleProvider="target" sceneMemberID="viewController">
+                <viewController storyboardIdentifier="ConnectViewController" id="EJf-7F-3KS" customClass="ConnectViewController" customModule="BLE_Chess" customModuleProvider="target" sceneMemberID="viewController">
                     <view key="view" contentMode="scaleToFill" id="79d-63-XWf">
                         <rect key="frame" x="0.0" y="0.0" width="375" height="812"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
@@ -266,26 +266,17 @@
                                 <nil key="highlightedColor"/>
                             </label>
                             <textField opaque="NO" contentMode="scaleToFill" horizontalHuggingPriority="248" fixedFrame="YES" contentHorizontalAlignment="left" contentVerticalAlignment="center" borderStyle="roundedRect" textAlignment="natural" minimumFontSize="17" translatesAutoresizingMaskIntoConstraints="NO" id="2uf-ni-KT9">
-                                <rect key="frame" x="16" y="91" width="254" height="34"/>
+                                <rect key="frame" x="21" y="79" width="254" height="34"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <fontDescription key="fontDescription" type="system" pointSize="14"/>
                                 <textInputTraits key="textInputTraits"/>
                             </textField>
-                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0AP-vS-h1V">
-                                <rect key="frame" x="283" y="91" width="65" height="35"/>
-                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
-                                <state key="normal" title="Button"/>
-                                <buttonConfiguration key="configuration" style="plain" title="Write"/>
-                                <connections>
-                                    <action selector="writeBtnClickWithSender:" destination="EJf-7F-3KS" eventType="touchUpInside" id="0wd-P3-QYT"/>
-                                </connections>
-                            </button>
                             <tableView clipsSubviews="YES" contentMode="scaleToFill" fixedFrame="YES" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="-1" estimatedSectionHeaderHeight="-1" sectionFooterHeight="-1" estimatedSectionFooterHeight="-1" translatesAutoresizingMaskIntoConstraints="NO" id="N8W-aj-bqY">
-                                <rect key="frame" x="16" y="151" width="343" height="627"/>
+                                <rect key="frame" x="16" y="128" width="343" height="246"/>
                                 <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <prototypes>
-                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="readDataCell" id="vf5-rf-EaE" customClass="ReadDataCell" customModule="CoreBluetoothLESample" customModuleProvider="target">
+                                    <tableViewCell clipsSubviews="YES" contentMode="scaleToFill" preservesSuperviewLayoutMargins="YES" selectionStyle="default" indentationWidth="10" reuseIdentifier="readDataCell" id="vf5-rf-EaE" customClass="ReadDataCell" customModule="BLE_Chess" customModuleProvider="target">
                                         <rect key="frame" x="0.0" y="50" width="343" height="43.666667938232422"/>
                                         <autoresizingMask key="autoresizingMask"/>
                                         <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" preservesSuperviewLayoutMargins="YES" insetsLayoutMarginsFromSafeArea="NO" tableViewCell="vf5-rf-EaE" id="VaI-Vr-2B1">
@@ -307,6 +298,24 @@
                                     </tableViewCell>
                                 </prototypes>
                             </tableView>
+                            <wkWebView contentMode="scaleToFill" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="z6d-Zb-SIB">
+                                <rect key="frame" x="16" y="382" width="343" height="396"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <color key="backgroundColor" red="0.36078431370000003" green="0.38823529410000002" blue="0.4039215686" alpha="1" colorSpace="custom" customColorSpace="sRGB"/>
+                                <wkWebViewConfiguration key="configuration">
+                                    <audiovisualMediaTypes key="mediaTypesRequiringUserActionForPlayback" none="YES"/>
+                                    <wkPreferences key="preferences"/>
+                                </wkWebViewConfiguration>
+                            </wkWebView>
+                            <button opaque="NO" contentMode="scaleToFill" fixedFrame="YES" contentHorizontalAlignment="center" contentVerticalAlignment="center" buttonType="system" lineBreakMode="middleTruncation" translatesAutoresizingMaskIntoConstraints="NO" id="0AP-vS-h1V">
+                                <rect key="frame" x="283" y="79" width="65" height="35"/>
+                                <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                <state key="normal" title="Button"/>
+                                <buttonConfiguration key="configuration" style="plain" title="Write"/>
+                                <connections>
+                                    <action selector="writeBtnClickWithSender:" destination="EJf-7F-3KS" eventType="touchUpInside" id="0wd-P3-QYT"/>
+                                </connections>
+                            </button>
                         </subviews>
                         <viewLayoutGuide key="safeArea" id="JQd-WR-yxy"/>
                         <color key="backgroundColor" systemColor="systemBackgroundColor"/>
@@ -314,6 +323,7 @@
                     <connections>
                         <outlet property="connectLabel" destination="jkn-Zj-DXC" id="aBl-3i-XpH"/>
                         <outlet property="readView" destination="N8W-aj-bqY" id="mQt-ec-7hI"/>
+                        <outlet property="webView" destination="z6d-Zb-SIB" id="jQo-vX-dGc"/>
                         <outlet property="writeBtn" destination="0AP-vS-h1V" id="FUJ-69-PCr"/>
                         <outlet property="writeText" destination="2uf-ni-KT9" id="1tp-Xj-FDd"/>
                     </connections>

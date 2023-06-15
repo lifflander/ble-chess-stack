@@ -9,6 +9,7 @@
 import Foundation
 import CoreBluetooth
 import UIKit
+import WebKit
 
 class ReadDataCell : UITableViewCell {
     @IBOutlet weak var lblReadString : UILabel!
@@ -19,6 +20,7 @@ class ConnectViewController : UIViewController {
     @IBOutlet weak var writeText: UITextField!
     @IBOutlet weak var writeBtn: UIButton!
     @IBOutlet weak var readView: UITableView!
+    @IBOutlet weak var webView: WKWebView!
     
     var svc : ScanViewController!
     var readStrings : [String] = []

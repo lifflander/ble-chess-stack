@@ -34,6 +34,15 @@ class ScanViewController : UIViewController {
         bleList.delegate = self
         activity.hidesWhenStopped = true
         lblTryingConnect.text = ""
+
+        NotificationCenter.default.addObserver(forName: UIApplication.didEnterBackgroundNotification, object: nil, queue: nil) { (notification) in
+            print("app did enter background")
+            self.currentPeripheral!.setNotifyValue(false, for: self.transferCharacteristic!)
+        }
+        NotificationCenter.default.addObserver(forName: UIApplication.didBecomeActiveNotification, object: nil, queue: nil) { (notification) in
+            print("app did enter foreground")
+            self.currentPeripheral!.setNotifyValue(true, for: self.transferCharacteristic!)
+        }
     }
     
     @IBAction func scanButtonClick(sender: Any) {
@@ -182,13 +191,15 @@ extension ScanViewController : CBPeripheralDelegate {
         if characteristic.isNotifying {
             os_log("Notification began on %@", characteristic)
             
-            let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ConnectViewController") as! ConnectViewController;
-            
-            currentPeripheral = peripheral
-            self.present(vc, animated: true, completion: nil)
-            vc.connectLabel.text = "Connected to: " + (peripheral.name ?? "")
-            vc.svc = self
-            connectViewController = vc
+            if connectViewController == nil {
+                let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ConnectViewController") as! ConnectViewController;
+
+                currentPeripheral = peripheral
+                self.present(vc, animated: true, completion: nil)
+                vc.connectLabel.text = "Connected to: " + (peripheral.name ?? "")
+                vc.svc = self
+                connectViewController = vc
+            }
         } else {
             os_log("Notification stopped on %@. Disconnecting", characteristic)
         }

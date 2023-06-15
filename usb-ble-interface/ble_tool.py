@@ -63,7 +63,7 @@ async def server(loop, queue):
     char_flags = (
         GATTCharacteristicProperties.read |
         GATTCharacteristicProperties.write |
-        GATTCharacteristicProperties.indicate
+        GATTCharacteristicProperties.notify
     )
     permissions = (
         GATTAttributePermissions.readable |
@@ -90,17 +90,17 @@ async def server(loop, queue):
 
     while True:
         await asyncio.sleep(0.1)
-        print("Updating")
-
-        while not await server.is_connected():
-            await asyncio.sleep(0.1)
 
         message = queue.get()
         print("Got message")
 
         c = server.get_characteristic(char_uuid)
-
         c.value = message
+
+        while not await server.is_connected():
+            await asyncio.sleep(0.1)
+
+        print("Connected")
 
         ret = server.update_value(
             service_uuid, char_uuid #"51FF12BB-3ED8-46E5-B4F9-D64E2FEC021B"
