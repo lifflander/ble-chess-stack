@@ -9,7 +9,7 @@ import { Chess, Move } from "chess.js";
 import { Square } from 'react-chessboard/dist/chessboard/types';
 
 const client = axios.create({
-    baseURL: "http://liff.us-west-2.elasticbeanstalk.com/"
+    baseURL: "https://liff.us-west-2.elasticbeanstalk.com/"
 });
 
 interface GameMove {

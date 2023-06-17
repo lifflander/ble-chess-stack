@@ -6,7 +6,7 @@ import axios from 'axios'
 // import { useHistory } from 'react-router-dom';
 
 const client = axios.create({
-    baseURL: "http://liff.us-west-2.elasticbeanstalk.com/"
+    baseURL: "https://liff.us-west-2.elasticbeanstalk.com/"
 });
 
 interface Move {
@@ -26,7 +26,7 @@ function App() {
     const [games, setGames] = useState<Game[]>([])
 
     useEffect(() => {
-        fetch("http://liff.us-west-2.elasticbeanstalk.com/test/")
+        fetch("https://liff.us-west-2.elasticbeanstalk.com/test/")
             .then((res) => res.json())
             .then((data) => setMessage(data.message));
     }, []);
