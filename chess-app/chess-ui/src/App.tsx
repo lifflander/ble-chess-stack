@@ -6,7 +6,7 @@ import axios from 'axios'
 // import { useHistory } from 'react-router-dom';
 
 const client = axios.create({
-    baseURL: "http://localhost:5000/" 
+    baseURL: "http://liff.us-west-2.elasticbeanstalk.com/"
 });
 
 interface Move {
@@ -26,7 +26,7 @@ function App() {
     const [games, setGames] = useState<Game[]>([])
 
     useEffect(() => {
-        fetch("http://localhost:5000/test/")
+        fetch("http://liff.us-west-2.elasticbeanstalk.com/test/")
             .then((res) => res.json())
             .then((data) => setMessage(data.message));
     }, []);
@@ -62,12 +62,13 @@ function App() {
 
     const renderTable = () => {
         return games.map((game, index : number) => {
-            let move_str : string = game.moves?.map((move : Move) : string => move.pgn).reduce((acc  : string, cur : string) : string => acc + cur, "" as string)
+            //let move_str : string = game.moves?.map((move : Move) : string => move.pgn).reduce((acc  : string, cur : string) : string => acc + cur, "" as string)
+            let move_len_str : string = "Moves: " + game.moves?.length
             return (
                 <tr>
                     <td>{game.id}</td>
                     <td>{game.title}</td>
-                    <td>{move_str}</td>
+                    <td>{move_len_str}</td>
                     <td>
                       <a href={"/games/" + game.id}>View</a>
                     </td>
