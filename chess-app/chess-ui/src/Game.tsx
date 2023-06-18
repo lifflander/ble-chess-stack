@@ -53,6 +53,7 @@ function Game() {
             setGame(fetched_game)
             updateDisplayedMoves(fetched_game, curMove)
             setPGNMoves(getPGNs(fetched_game.moves))
+            setCurMove(fetched_game.moves.length)
         })
     }
 
@@ -134,6 +135,20 @@ function Game() {
         return true;
     }
 
+    const prevMove = (cm : number) => {
+        if (cm-1 > 0) {
+            setCurMove(cm-1)
+            updateMove(cm-1)
+        }
+    }
+
+    const nextMove = (cm : number) => {
+        if (cm+1 <= game!.moves.length) {
+            setCurMove(cm+1)
+            updateMove(cm+1)
+        }
+    }
+
     const outputCurrentState = () => {
         if (chessState.isStalemate()) {
             return "Draw -- Stalemate"
@@ -191,6 +206,8 @@ function Game() {
                 <div className="row">
                 <div className="col-12">
                 <div className="moves">
+                <button className="btn btn-secondary prev-button" onClick={() => prevMove(curMove!)}>Prev</button>
+                <button className="btn btn-secondary next-button" onClick={() => nextMove(curMove!)}>Next</button>
                 {renderMoves()}
                 </div>
                 </div>
@@ -198,7 +215,7 @@ function Game() {
 
                 <div className="row">
                 <div className="col-12">
-            {}
+                {}
                 </div>
                 </div>
             </div>
