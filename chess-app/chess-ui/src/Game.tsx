@@ -98,13 +98,17 @@ function Game() {
         return game?.moves.map((move : GameMove, index : number) => {
             const moveIndex = move.moveIndex + 1
             return (
-                <span className="moveSpan">
-                    {(moveIndex-1) % 2 == 0 ? ((moveIndex + 1) / 2).toString() + ". " : ""}
+                <span className="moveSpan span">
+                    <span className="moveIndex">
+                        {(moveIndex-1) % 2 == 0 ? ((moveIndex + 1) / 2).toString() + ". " : ""}
+                    </span>
+                    <span className="moveElement">
                     <a
                         className={getSelectedMoveClass(moveIndex, curMove!)}
                         onClick={() => updateMove(moveIndex)}
-                    >{PGNMoves[moveIndex-1]}
+                    >{PGNMoves[moveIndex-1] + " "}
                     </a>
+                    </span>
                 </span>
             )
         })
@@ -150,15 +154,54 @@ function Game() {
 
     return (
         <div className="Game">
-            <header className="App-header">
-              GameID: {game?.id}<br/> Title: {game?.title}
-              <div>
-              {renderMoves()}
-              </div>
-            <div className='chess-board'>
-            <Chessboard position={chessState.fen()} onPieceDrop={onDrop} />
+            <header>
+              <div className='container'>
+                <div className="row">
+                <div className="col-12">
+                <span className="span"> GameID: {game?.id} </span>
+                <span className="span"> Moves {game?.moves.length} </span>
+                <span className="span"> Title: {game?.title} </span>
+                </div>
+                </div>
+
+                <div className="top-row row">
+                <div className="col-10">
+                <h4>Player 2</h4>
+                </div>
+                <div className="col-2">
+                <h4> Time </h4>
+                </div>
+                </div>
+
+                <div className="row">
+                <div className="col-12">
+                <Chessboard position={chessState.fen()} onPieceDrop={onDrop} />
+                </div>
+                </div>
+
+                <div className="bottom-row row">
+                <div className="col-10">
+                <h4>Player 1</h4>
+                </div>
+                <div className="col-2">
+                <h4> Time </h4>
+                </div>
+                </div>
+
+                <div className="row">
+                <div className="col-12">
+                <div className="moves">
+                {renderMoves()}
+                </div>
+                </div>
+                </div>
+
+                <div className="row">
+                <div className="col-12">
+            {}
+                </div>
+                </div>
             </div>
-            {outputCurrentState()}
             </header>
         </div>
     );
