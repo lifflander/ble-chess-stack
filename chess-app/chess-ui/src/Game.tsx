@@ -170,7 +170,7 @@ function Game() {
     }
 
     const getOrient = () => {
-        return (orientation ? "white" : "black") as BoardOrientation
+        return (orientation ? "black" : "white") as BoardOrientation
     }
 
     const switchOrientation = (o : boolean) => {
