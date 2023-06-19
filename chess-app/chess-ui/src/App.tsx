@@ -81,18 +81,15 @@ function App() {
     return (
         <div className="App">
             <header className="App-header">
-              <p>
-              OK. {message}
-              </p>
               <div className="add-game-container">
                 <form onSubmit={handleSubmit}>
                    <input type="text" className="form-control" value={title} onChange={(e) => setTitle(e.target.value)} />
                    <button type="submit">Add Game</button>
-                </form>
+                   </form>
               </div>
 	      <div className="table-holder">
               <table id="games" className="table table-sm Table-color">
-              <thead>
+              <thead className="thead-dark">
                 <tr>
                   <th>ID</th>
                   <th>Title</th>

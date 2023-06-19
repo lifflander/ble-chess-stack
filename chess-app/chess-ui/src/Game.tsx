@@ -6,7 +6,8 @@ import './App.css';
 import axios from 'axios'
 import { Chessboard } from 'react-chessboard'
 import { Chess, Move } from "chess.js";
-import { Square } from 'react-chessboard/dist/chessboard/types';
+import { BoardOrientation, Square } from 'react-chessboard/dist/chessboard/types';
+import { ChessBoard } from 'chessboardjs';
 
 const client = axios.create({
     baseURL: "https://liff.us-west-2.elasticbeanstalk.com/"
@@ -36,6 +37,7 @@ function Game() {
     const [curMove, setCurMove] = useState<number>()
     const [chessState, setChessState] = useState<Chess>(new Chess());
     const [PGNMoves, setPGNMoves] = useState<string[]>([]);
+    const [orientation, setOrientation] = useState<boolean>();
 
     let { gameID } = useParams();
 
@@ -167,6 +169,14 @@ function Game() {
         }
     }
 
+    const getOrient = () => {
+        return (orientation ? "white" : "black") as BoardOrientation
+    }
+
+    const switchOrientation = (o : boolean) => {
+        setOrientation(!o)
+    }
+
     return (
         <div className="Game">
             <header>
@@ -190,7 +200,7 @@ function Game() {
 
                 <div className="row">
                 <div className="col-12">
-                <Chessboard position={chessState.fen()} onPieceDrop={onDrop} />
+                <Chessboard boardOrientation={orientation! ? "white" : "black"} position={chessState.fen()} onPieceDrop={onDrop} />
                 </div>
                 </div>
 
@@ -215,7 +225,7 @@ function Game() {
 
                 <div className="row">
                 <div className="col-12">
-                {}
+                <button className="btn btn-secondary" onClick={() => switchOrientation(orientation!)}>Swap orientation</button>
                 </div>
                 </div>
             </div>
