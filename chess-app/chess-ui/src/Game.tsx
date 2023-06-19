@@ -64,11 +64,13 @@ function Game() {
             const s : Chess = new Chess()
             game.moves.map((move) => {
                 if (move.moveIndex < moveNum) {
-                    s.move({
-                        from: move.pgn.substring(0, 2) as Square,
-                        to: move.pgn.substring(2, 4) as Square,
-                        promotion: "q"
-                    })
+                    if (!s.isGameOver) { 
+                        s.move({
+                            from: move.pgn.substring(0, 2) as Square,
+                            to: move.pgn.substring(2, 4) as Square,
+                            promotion: "q"
+                        })
+                    }
                 }
             })
             setChessState(s)
@@ -87,11 +89,13 @@ function Game() {
     const getPGNs = (moves : GameMove[]) : string[] => {
         const s : Chess = new Chess()
         moves.map((move) => {
-            s.move({
-                from: move.pgn.substring(0, 2) as Square,
-                to: move.pgn.substring(2, 4) as Square,
-                promotion: "q"
-            })
+            if (!s.isGameOver) { 
+                s.move({
+                    from: move.pgn.substring(0, 2) as Square,
+                    to: move.pgn.substring(2, 4) as Square,
+                    promotion: "q"
+                })
+            }
         })
         const history : Move[] = s.history({verbose: true})
         return history.map((h) => h.san);
