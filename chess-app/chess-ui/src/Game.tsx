@@ -327,8 +327,8 @@ function Game() {
             } else {
                 return (
                    <form onSubmit={submitWhiteName} className="submit-name">
-                   <input type="text" className="form-control" value={whiteName} onChange={(e) => setWhiteName(e.target.value)} />
-                   <button className='btn btn-secondary' type="submit">Update</button>
+                   <input type="text" size={8} value={whiteName} onChange={(e) => setWhiteName(e.target.value)} />
+                   <button className='btn btn-secondary' type="submit">Set white name</button>
                    </form>
                 )
             }
@@ -338,8 +338,8 @@ function Game() {
             } else {
                 return (
                     <form onSubmit={submitBlackName} className="submit-name">
-                    <input type="text" className="form-control" value={blackName} onChange={(e) => setBlackName(e.target.value)} />
-                    <button className='btn btn-secondary' type="submit">Update</button>
+                    <input type="text" size={8} value={blackName} onChange={(e) => setBlackName(e.target.value)} />
+                    <button className='btn btn-secondary' type="submit">Set black name</button>
                     </form>
                  )
             }
@@ -352,9 +352,9 @@ function Game() {
         } else {
             return (
                 <form onSubmit={submitTimeControl} className="submit-name">
-                <input type="text" className="form-control" value={mins} onChange={(e) => setMins(+e.target.value)} />+
-                <input type="text" className="form-control" value={bonus} onChange={(e) => setBonus(+e.target.value)} />
-                <button className='btn btn-secondary' type="submit">Update</button>
+                <input type="text" size={8} value={mins} onChange={(e) => setMins(+e.target.value)} />+
+                <input type="text" size={8} value={bonus} onChange={(e) => setBonus(+e.target.value)} />
+                <button className='btn btn-secondary' type="submit">Set TC</button>
                 </form>
              )
         }

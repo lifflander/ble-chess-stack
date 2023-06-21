@@ -58,8 +58,9 @@
 }
 
 .submit-name {
-  width: 30%;
   display: flex;
+  flex-flow: row wrap;
+  align-items: center;
 }
 
 .moves {
