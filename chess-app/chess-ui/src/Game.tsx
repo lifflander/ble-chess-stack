@@ -98,7 +98,7 @@ function Game() {
         var blackOffset : number[] = []
 
         for (let i = 0; i < g.moves.length; i++) {
-            let j = i / 2 | 0
+            let j = Math.floor(i / 2)
             if (i % 2 == 0) {
                 whiteCreate[j] = Date.parse(g.moves[i].createdAt)
             } else {
@@ -118,7 +118,7 @@ function Game() {
             if (i == 0) {
                 blackOffset[0] = 0
             } else {
-                blackOffset[i] = blackCreate[i] - whiteCreate[i-1]
+                blackOffset[i] = blackCreate[i] - whiteCreate[i]
             }
         }
 
