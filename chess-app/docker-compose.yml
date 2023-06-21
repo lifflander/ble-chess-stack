@@ -17,12 +17,13 @@ services:
     backend:
         build:
             context: ./backend
-            dockerfile: Dockerfile
+            dockerfile: dev.dockerfile
         environment:
           PSQL_HOST: postgres
           POSTGRES_PASSWORD: ${POSTGRES_PASSWORD:-mypassword}
           POSTGRES_USER: ${POSTGRES_USER:-postgres}
           POSTGRES_DB: ${POSTGRES_DB:-chessgame}
+          CONFIG: dev
         volumes:
             - /app/node_modules
             - ./backend/config:/app/config
@@ -37,6 +38,8 @@ services:
         build:
             context: ./chess-ui
             dockerfile: Dockerfile
+        environment:
+            REACT_APP_CONFIG: dev
         volumes:
             - /app/node_modules
             - ./chess-ui:/app

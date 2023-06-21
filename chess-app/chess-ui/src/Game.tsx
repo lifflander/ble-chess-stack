@@ -8,9 +8,12 @@ import { Chessboard } from 'react-chessboard'
 import { Chess, Move } from "chess.js";
 import { BoardOrientation, Square } from 'react-chessboard/dist/chessboard/types';
 import { ChessBoard } from 'chessboardjs';
+import { getServerConfig } from './config';
+
+const serverConfig = getServerConfig()
 
 const client = axios.create({
-    baseURL: "https://liff.us-west-2.elasticbeanstalk.com/"
+    baseURL: serverConfig.host
 });
 
 interface GameMove {

@@ -3,10 +3,12 @@ import React, { useState, useEffect } from 'react';
 import logo from './logo.svg';
 import './App.css';
 import axios from 'axios'
-// import { useHistory } from 'react-router-dom';
+import { getServerConfig } from './config';
+
+const serverConfig = getServerConfig()
 
 const client = axios.create({
-    baseURL: "https://liff.us-west-2.elasticbeanstalk.com/"
+    baseURL: serverConfig.host
 });
 
 interface Move {
@@ -26,7 +28,7 @@ function App() {
     const [games, setGames] = useState<Game[]>([])
 
     useEffect(() => {
-        fetch("https://liff.us-west-2.elasticbeanstalk.com/test/")
+        fetch(serverConfig.host + "test/")
             .then((res) => res.json())
             .then((data) => setMessage(data.message));
     }, []);
