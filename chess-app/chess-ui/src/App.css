@@ -17,7 +17,7 @@
   width: 75%;
 }
 .chess-board {
-  width: 50%;
+  height: fit-content;
 }
 
 .move {
@@ -53,12 +53,18 @@
 .moveElement {
 }
 
+.submit-name {
+  width: 30%;
+  display: flex;
+}
+
 .moves {
     background-color: rgb(21, 21, 21);
     padding-left: 10px;
     padding-right: 10px;
     padding-top: 5px;
     padding-bottom: 5px;
+    margin-bottom: 10px;
 }
 
 .App-header {

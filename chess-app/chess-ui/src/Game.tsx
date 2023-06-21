@@ -18,12 +18,17 @@ interface GameMove {
     pgn: string
     gameID : number
     moveIndex : number
+    createdAt : string
 }
 
 interface Game {
     id: number
     title: string
     moves: GameMove[]
+    whiteName: string
+    blackName: string
+    minutes: number
+    bonus: number
 };
 
 interface StateMove {
@@ -38,6 +43,14 @@ function Game() {
     const [chessState, setChessState] = useState<Chess>(new Chess());
     const [PGNMoves, setPGNMoves] = useState<string[]>([]);
     const [orientation, setOrientation] = useState<boolean>();
+    const [whiteName, setWhiteName] = useState<string>();
+    const [blackName, setBlackName] = useState<string>();
+    const [mins, setMins] = useState<number>();
+    const [bonus, setBonus] = useState<number>();
+    const [whiteTimes, setWhiteTimes] = useState<number[]>();
+    const [blackTimes, setBlackTimes] = useState<number[]>();
+    const [whiteTimesSum, setWhiteTimesSum] = useState<number[]>();
+    const [blackTimesSum, setBlackTimesSum] = useState<number[]>();
 
     let { gameID } = useParams();
 
@@ -56,7 +69,75 @@ function Game() {
             updateDisplayedMoves(fetched_game, curMove)
             setPGNMoves(getPGNs(fetched_game.moves))
             setCurMove(fetched_game.moves.length)
+            setTimes(fetched_game)
+            console.log("WT:", whiteTimes)
         })
+    }
+
+    const getTimeString = (duration : number) => {
+        let milliseconds = Math.floor((duration % 1000) / 100),
+            seconds = Math.floor((duration / 1000) % 60),
+            minutes = Math.floor((duration / (1000 * 60)) % 60),
+            hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
+        return (hours != 0 ? hours + ":" : "") + (minutes != 0 ? minutes + ":" : "") + seconds + "." + milliseconds
+    }
+
+    const setTimes = (g : Game) => {
+        if (g.moves.length < 3) {
+            return
+        }
+
+        var whiteCreate : number[] = []
+        var blackCreate : number[] = []
+        var whiteOffset : number[] = []
+        var blackOffset : number[] = []
+
+        for (let i = 0; i < g.moves.length; i++) {
+            let j = i / 2 | 0
+            if (i % 2 == 0) {
+                whiteCreate[j] = Date.parse(g.moves[i].createdAt)
+            } else {
+                blackCreate[j] = Date.parse(g.moves[i].createdAt)
+            }
+        }
+
+        for (let i = 0; i < whiteCreate.length; i++) {
+            if (i == 0) {
+                whiteOffset[0] = 0
+            } else {
+                whiteOffset[i] = whiteCreate[i] - blackCreate[i-1]
+            }
+        }
+
+        for (let i = 0; i < blackCreate.length; i++) {
+            if (i == 0) {
+                blackOffset[0] = 0
+            } else {
+                blackOffset[i] = blackCreate[i] - whiteCreate[i-1]
+            }
+        }
+
+        console.log("white: ", whiteCreate, whiteOffset.map((x) => getTimeString(x)))
+        console.log("black: ", blackCreate, blackOffset.map((x) => getTimeString(x)))
+
+        setWhiteTimes(whiteOffset)
+        setBlackTimes(blackOffset)
+
+        // prefix sum on times to get time expended
+        let whiteTimesSumLocal : number[] = []
+        let blackTimesSumLocal : number[] = []
+
+        whiteTimesSumLocal[0] = whiteOffset[0]
+        blackTimesSumLocal[0] = whiteOffset[0]
+        for (let i = 1; i < whiteOffset.length; i++) {
+            whiteTimesSumLocal[i] = whiteTimesSumLocal[i-1] + whiteOffset[i]
+        }
+        for (let i = 1; i < blackOffset.length; i++) {
+            blackTimesSumLocal[i] = blackTimesSumLocal[i-1] + blackOffset[i]
+        }
+
+        setWhiteTimesSum(whiteTimesSumLocal)
+        setBlackTimesSum(blackTimesSumLocal)
     }
 
     const updateDisplayedMoves = (game : Game, moveNum : number = 100000000) => {
@@ -177,6 +258,103 @@ function Game() {
         setOrientation(!o)
     }
 
+    const getPlayerTop = (o : boolean) => {
+        return getPlayerName(o)
+    }
+
+    const getPlayerBottom = (o : boolean) => {
+        return getPlayerName(!o)
+    }
+
+    const getTimeTop = (o : boolean, m : number, whiteTimesSumLocal : number[], blackTimesSumLocal : number[])  => {
+        return getTime(o, m, whiteTimesSumLocal, blackTimesSumLocal)
+    }
+
+    const getTimeBottom = (o : boolean, m : number, whiteTimesSumLocal : number[], blackTimesSumLocal : number[])  => {
+        return getTime(!o, m, whiteTimesSumLocal, blackTimesSumLocal)
+    }
+
+    const submitWhiteName = async (e : React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const update = { whiteName: whiteName }
+        await client.put('games/' + game!.id, update).then(json => {
+            console.log(json)
+        })
+    }
+
+    const submitBlackName = async (e : React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const update = { blackName: blackName }
+        await client.put('games/' + game!.id, update).then(json => {
+            console.log(json)
+        })
+    }
+
+    const submitTimeControl = async (e : React.FormEvent<HTMLFormElement>) => {
+        e.preventDefault();
+        const update = { minutes: mins, bonus: bonus }
+        await client.put('games/' + game!.id, update).then(json => {
+            console.log(json)
+        })
+    }
+
+    const getTime = (color : boolean, m : number, whiteTimesSumLocal : number[], blackTimesSumLocal : number[]) => {
+        if (!m) return "Time"
+        //console.log("move=", m, "wt=", whiteTimesSumLocal)
+        m = m - 1
+        if (color) {
+            if (m % 2 != 0) {
+                m = m - 1
+            }
+            return getTimeString(whiteTimesSumLocal[m / 2])
+        } else {
+            if (m % 2 == 0) {
+                m = m - 1
+            }
+            return getTimeString(blackTimesSumLocal[m / 2 | 0])
+        }
+    }
+
+    const getPlayerName = (color : boolean) => {
+        if (color) {
+            if (game?.whiteName) {
+                return (<span>{game?.whiteName}</span>);
+            } else {
+                return (
+                   <form onSubmit={submitWhiteName} className="submit-name">
+                   <input type="text" className="form-control" value={whiteName} onChange={(e) => setWhiteName(e.target.value)} />
+                   <button className='btn btn-secondary' type="submit">Update</button>
+                   </form>
+                )
+            }
+        } else {
+            if (game?.blackName) {
+                return (<span>{game?.blackName}</span>);
+            } else {
+                return (
+                    <form onSubmit={submitBlackName} className="submit-name">
+                    <input type="text" className="form-control" value={blackName} onChange={(e) => setBlackName(e.target.value)} />
+                    <button className='btn btn-secondary' type="submit">Update</button>
+                    </form>
+                 )
+            }
+        }
+    }
+
+    const getTimeControl = () => {
+        if (game?.minutes) {
+            return (<span>{game?.minutes + "+" + game?.bonus}</span>)
+        } else {
+            return (
+                <form onSubmit={submitTimeControl} className="submit-name">
+                <input type="text" className="form-control" value={mins} onChange={(e) => setMins(+e.target.value)} />+
+                <input type="text" className="form-control" value={bonus} onChange={(e) => setBonus(+e.target.value)} />
+                <button className='btn btn-secondary' type="submit">Update</button>
+                </form>
+             )
+        }
+    }
+
     return (
         <div className="Game">
             <header>
@@ -186,30 +364,33 @@ function Game() {
                 <span className="span"> GameID: {game?.id} </span>
                 <span className="span"> Moves {game?.moves.length} </span>
                 <span className="span"> Title: {game?.title} </span>
+                <span className="span"> Time Control: {getTimeControl()} </span>
                 </div>
                 </div>
 
                 <div className="top-row row">
                 <div className="col-10">
-                <h4>Player 2</h4>
+                <h4>{getPlayerTop(orientation!)}</h4>
                 </div>
                 <div className="col-2">
-                <h4> Time </h4>
+                <h4>{getTimeTop(orientation!, curMove!, whiteTimesSum!, blackTimesSum!)}</h4>
                 </div>
                 </div>
 
                 <div className="row">
                 <div className="col-12">
-                <Chessboard boardOrientation={orientation! ? "white" : "black"} position={chessState.fen()} onPieceDrop={onDrop} />
+                <div className="chess-board">
+                <Chessboard boardOrientation={orientation! ? "black" : "white"} position={chessState.fen()} onPieceDrop={onDrop} />
+                </div>
                 </div>
                 </div>
 
                 <div className="bottom-row row">
                 <div className="col-10">
-                <h4>Player 1</h4>
+                <h4>{getPlayerBottom(orientation!)}</h4>
                 </div>
                 <div className="col-2">
-                <h4> Time </h4>
+                <h4>{getTimeBottom(orientation!, curMove!, whiteTimesSum!, blackTimesSum!)}</h4>
                 </div>
                 </div>
 
