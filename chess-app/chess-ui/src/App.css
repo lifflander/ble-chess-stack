@@ -25,6 +25,10 @@
   text-decoration: none;
 }
 
+.time-control {
+  border: 1px solid red;
+}
+
 .move:hover {
   color: yellow;
   cursor: pointer;

@@ -361,24 +361,24 @@ function Game() {
               <div className='container'>
                 <div className="row">
                 <div className="col-12">
-                <span className="span"> GameID: {game?.id} </span>
-                <span className="span"> Moves {game?.moves.length} </span>
-                <span className="span"> Title: {game?.title} </span>
-                <span className="span"> Time Control: {getTimeControl()} </span>
+                <span className="span"> ID: {game?.id} </span>
+                <span className="span"> Moves: {game?.moves.length} </span>
+                <span className="span"> Name: {game?.title} </span>
+                <span className="span"> TC: {getTimeControl()} </span>
                 </div>
                 </div>
 
                 <div className="top-row row">
-                <div className="col-10">
+                <div className="col">
                 <h4>{getPlayerTop(orientation!)}</h4>
                 </div>
-                <div className="col-2">
+                <div className="col text-end">
                 <h4>{getTimeTop(orientation!, curMove!, whiteTimesSum!, blackTimesSum!)}</h4>
                 </div>
                 </div>
 
                 <div className="row">
-                <div className="col-12">
+                <div className="col">
                 <div className="chess-board">
                 <Chessboard boardOrientation={orientation! ? "black" : "white"} position={chessState.fen()} onPieceDrop={onDrop} />
                 </div>
@@ -386,10 +386,10 @@ function Game() {
                 </div>
 
                 <div className="bottom-row row">
-                <div className="col-10">
+                <div className="col">
                 <h4>{getPlayerBottom(orientation!)}</h4>
                 </div>
-                <div className="col-2">
+                <div className="col text-end">
                 <h4>{getTimeBottom(orientation!, curMove!, whiteTimesSum!, blackTimesSum!)}</h4>
                 </div>
                 </div>
