@@ -43,17 +43,18 @@ interface StateMove {
 function Game() {
     const [game, setGame] = useState<Game>()
     const [curMove, setCurMove] = useState<number>()
-    const [chessState, setChessState] = useState<Chess>(new Chess());
-    const [PGNMoves, setPGNMoves] = useState<string[]>([]);
-    const [orientation, setOrientation] = useState<boolean>();
-    const [whiteName, setWhiteName] = useState<string>();
-    const [blackName, setBlackName] = useState<string>();
-    const [mins, setMins] = useState<number>();
-    const [bonus, setBonus] = useState<number>();
-    const [whiteTimes, setWhiteTimes] = useState<number[]>();
-    const [blackTimes, setBlackTimes] = useState<number[]>();
-    const [whiteTimesSum, setWhiteTimesSum] = useState<number[]>();
-    const [blackTimesSum, setBlackTimesSum] = useState<number[]>();
+    const [chessState, setChessState] = useState<Chess>(new Chess())
+    const [PGNMoves, setPGNMoves] = useState<string[]>([])
+    const [orientation, setOrientation] = useState<boolean>()
+    const [whiteName, setWhiteName] = useState<string>()
+    const [blackName, setBlackName] = useState<string>()
+    const [mins, setMins] = useState<number>()
+    const [bonus, setBonus] = useState<number>()
+    const [whiteTimes, setWhiteTimes] = useState<number[]>()
+    const [blackTimes, setBlackTimes] = useState<number[]>()
+    const [whiteTimesSum, setWhiteTimesSum] = useState<number[]>()
+    const [blackTimesSum, setBlackTimesSum] = useState<number[]>()
+    const [timeDirection, setTimeDirection] = useState<boolean>()
 
     let { gameID } = useParams();
 
@@ -73,6 +74,8 @@ function Game() {
             setPGNMoves(getPGNs(fetched_game.moves))
             setCurMove(fetched_game.moves.length)
             setTimes(fetched_game)
+            setMins(fetched_game.minutes)
+            setBonus(fetched_game.bonus)
             console.log("WT:", whiteTimes)
         })
     }
@@ -83,7 +86,7 @@ function Game() {
             minutes = Math.floor((duration / (1000 * 60)) % 60),
             hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
         const addZero = (num : number, hasLeading : boolean) : string => {
-            return num < 10 && hasLeading ? "0" + num : num.toString();
+            return num < 10 && hasLeading ? "0" + num : num.toString()
         }
         return (hours != 0 ? addZero(hours, false) + ":" : "") +
                (minutes != 0 ? addZero(minutes, hours != 0) + ":" : "") +
@@ -183,7 +186,7 @@ function Game() {
             })
         })
         const history : Move[] = s.history({verbose: true})
-        return history.map((h) => h.san);
+        return history.map((h) => h.san)
     }
 
     const renderMoves = () => {
@@ -208,10 +211,10 @@ function Game() {
 
     const makeAMove = (move : StateMove) => {
         const copyOfBoard : Chess = new Chess(chessState.fen())
-        const result = copyOfBoard.move(move);
+        const result = copyOfBoard.move(move)
         console.log("moving: ", result)
-        setChessState(copyOfBoard);
-        return result; // null if the move was illegal, the move object if the move was legal
+        setChessState(copyOfBoard)
+        return result // null if the move was illegal, the move object if the move was legal
     }
 
     const onDrop = (sourceSquare : Square, targetSquare : Square) => {
@@ -219,11 +222,11 @@ function Game() {
             from: sourceSquare,
             to: targetSquare,
             promotion: "q"
-        });
+        })
 
         // illegal move
-        if (move === null) return false;
-        return true;
+        if (move === null) return false
+        return true
     }
 
     const prevMove = (cm : number) => {
@@ -266,6 +269,10 @@ function Game() {
         setOrientation(!o)
     }
 
+    const switchTimeDirection = (direction : boolean) => {
+        setTimeDirection(!direction)
+    }
+
     const getPlayerTop = (o : boolean) => {
         return getPlayerName(o)
     }
@@ -274,16 +281,16 @@ function Game() {
         return getPlayerName(!o)
     }
 
-    const getTimeTop = (o : boolean, m : number, whiteTimesSumLocal : number[], blackTimesSumLocal : number[])  => {
-        return getTime(o, m, whiteTimesSumLocal, blackTimesSumLocal)
+    const getTimeTop = (o : boolean, m : number, whiteTimesSumLocal : number[], blackTimesSumLocal : number[], direction : boolean)  => {
+        return getTime(o, m, whiteTimesSumLocal, blackTimesSumLocal, direction)
     }
 
-    const getTimeBottom = (o : boolean, m : number, whiteTimesSumLocal : number[], blackTimesSumLocal : number[])  => {
-        return getTime(!o, m, whiteTimesSumLocal, blackTimesSumLocal)
+    const getTimeBottom = (o : boolean, m : number, whiteTimesSumLocal : number[], blackTimesSumLocal : number[], direction : boolean)  => {
+        return getTime(!o, m, whiteTimesSumLocal, blackTimesSumLocal, direction)
     }
 
     const submitWhiteName = async (e : React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+        e.preventDefault()
         const update = { whiteName: whiteName }
         await client.put('games/' + game!.id, update).then(json => {
             console.log(json)
@@ -291,7 +298,7 @@ function Game() {
     }
 
     const submitBlackName = async (e : React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+        e.preventDefault()
         const update = { blackName: blackName }
         await client.put('games/' + game!.id, update).then(json => {
             console.log(json)
@@ -299,14 +306,14 @@ function Game() {
     }
 
     const submitTimeControl = async (e : React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+        e.preventDefault()
         const update = { minutes: mins, bonus: bonus }
         await client.put('games/' + game!.id, update).then(json => {
             console.log(json)
         })
     }
 
-    const getTime = (color : boolean, m : number, whiteTimesSumLocal : number[], blackTimesSumLocal : number[]) => {
+    const getTime = (color : boolean, m : number, whiteTimesSumLocal : number[], blackTimesSumLocal : number[], direction : boolean) => {
         if (!m) return "Time"
         //console.log("move=", m, "wt=", whiteTimesSumLocal)
         m = m - 1
@@ -314,19 +321,31 @@ function Game() {
             if (m % 2 != 0) {
                 m = m - 1
             }
-            return getTimeString(whiteTimesSumLocal[m / 2])
+            if (direction) {
+                let total = mins!
+                let bonus_sec = bonus!
+                return getTimeString((total*60*1000)+(bonus_sec*10000*(m/2))-whiteTimesSumLocal[m / 2])
+            } else {
+                return getTimeString(whiteTimesSumLocal[m / 2])
+            }
         } else {
             if (m % 2 == 0) {
                 m = m - 1
             }
-            return getTimeString(blackTimesSumLocal[m / 2 | 0])
+            if (direction) {
+                let total = mins!
+                let bonus_sec = bonus!
+                return getTimeString((total*60*1000)+(bonus_sec*10000*(m/2|0))-blackTimesSumLocal[m / 2 | 0])
+            } else {
+                return getTimeString(blackTimesSumLocal[m / 2 | 0])
+            }
         }
     }
 
     const getPlayerName = (color : boolean) => {
         if (color) {
             if (game?.whiteName) {
-                return (<span>{game?.whiteName}</span>);
+                return (<span>{game?.whiteName}</span>)
             } else {
                 return (
                    <form onSubmit={submitWhiteName} className="submit-name">
@@ -337,7 +356,7 @@ function Game() {
             }
         } else {
             if (game?.blackName) {
-                return (<span>{game?.blackName}</span>);
+                return (<span>{game?.blackName}</span>)
             } else {
                 return (
                     <form onSubmit={submitBlackName} className="submit-name">
@@ -381,7 +400,7 @@ function Game() {
                 <h4 className="player-name">{getPlayerTop(orientation!)}</h4>
                 </div>
                 <div className="col text-end">
-                <h4 className="time-control">{getTimeTop(orientation!, curMove!, whiteTimesSum!, blackTimesSum!)}</h4>
+                <h4 className="time-control">{getTimeTop(orientation!, curMove!, whiteTimesSum!, blackTimesSum!, timeDirection!)}</h4>
                 </div>
                 </div>
 
@@ -398,7 +417,7 @@ function Game() {
                 <h4 className="player-name">{getPlayerBottom(orientation!)}</h4>
                 </div>
                 <div className="col text-end">
-                <h4 className="time-control">{getTimeBottom(orientation!, curMove!, whiteTimesSum!, blackTimesSum!)}</h4>
+                <h4 className="time-control">{getTimeBottom(orientation!, curMove!, whiteTimesSum!, blackTimesSum!, timeDirection!)}</h4>
                 </div>
                 </div>
 
@@ -415,12 +434,13 @@ function Game() {
                 <div className="row">
                 <div className="col-12">
                 <button className="btn btn-secondary" onClick={() => switchOrientation(orientation!)}>Swap orientation</button>
+                <button className="btn btn-secondary" onClick={() => switchTimeDirection(timeDirection!)}>Swap time direction</button>
                 </div>
                 </div>
             </div>
             </header>
         </div>
-    );
+    )
 }
 
-export default Game;
+export default Game
