@@ -2,7 +2,7 @@
 import express, { Request, Response } from 'express';
 import cors from 'cors';
 
-import { Sequelize } from 'sequelize-typescript';
+import { Sequelize, DataType } from 'sequelize-typescript';
 import { ChessGame } from "./game";
 import { ChessMove } from "./move";
 import bodyParser from 'body-parser'
@@ -12,14 +12,17 @@ const port = 5000;
 
 app.use(cors())
 
-// const dbc = require("../config/db.config.js");
+import { getDBConfig } from "../config/db.config";
+
+const dbConfig = getDBConfig()
 
 const sequelize = new Sequelize({
     dialect: "postgres",
-    host: "postgres",
-    username: "postgres",
-    password: "mypassword",
-    database: "chessgame",
+    host: dbConfig.host,
+    username: dbConfig.username,
+    password: dbConfig.password,
+    database: dbConfig.database,
+    port: dbConfig.port,
     logging: console.log,
     models: [ ChessGame, ChessMove ]
 });
@@ -92,4 +95,12 @@ app.post("/moves", bodyParser.json(), async (req: Request, res: Response): Promi
     const allmoves : ChessMove[] = await ChessMove.findAll({where: { gameID: newmove.gameID }});
     const game: ChessMove = await ChessMove.create({ ...req.body, moveIndex: allmoves.length });
     return res.status(201).json(game);
+});
+
+app.delete("/moves/:id", bodyParser.json(), async (req: Request, res: Response): Promise<Response> => {
+    const { id } = req.params;
+
+    const ret : number = await ChessMove.destroy({where: { moveIndex: id }});
+
+    return res.status(200);
 });

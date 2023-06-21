@@ -121,5 +121,7 @@
     "emitDecoratorMetadata": true,
     "target": "esnext",
     "moduleResolution": "Node",
+    "target": "esnext",
+    "module": "commonjs"
   }
 }

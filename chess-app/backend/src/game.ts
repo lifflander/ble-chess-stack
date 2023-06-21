@@ -16,4 +16,24 @@ export class ChessGame extends Model {
 
     @HasMany(() => ChessMove)
     declare moves: ChessMove[];
+
+    @Column({
+        type: DataType.STRING,
+    })
+    declare whiteName: string;
+
+    @Column({
+        type: DataType.STRING,
+    })
+    declare blackName: string;
+
+    @Column({
+        type: DataType.INTEGER,
+    })
+    declare minutes: number;
+
+    @Column({
+        type: DataType.INTEGER,
+    })
+    declare bonus: number;
 }
