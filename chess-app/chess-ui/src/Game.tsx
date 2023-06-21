@@ -79,7 +79,12 @@ function Game() {
             seconds = Math.floor((duration / 1000) % 60),
             minutes = Math.floor((duration / (1000 * 60)) % 60),
             hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
-        return (hours != 0 ? hours + ":" : "") + (minutes != 0 ? minutes + ":" : "") + seconds + "." + milliseconds
+        const addZero = (num : number) : string => {
+            return num < 10 ? "0" + num : num.toString();
+        }
+        return (hours != 0 ? addZero(hours) + ":" : "") +
+               (minutes != 0 ? addZero(minutes) + ":" : "") +
+               addZero(seconds) + "." + milliseconds
     }
 
     const setTimes = (g : Game) => {
@@ -370,10 +375,10 @@ function Game() {
 
                 <div className="top-row row">
                 <div className="col">
-                <h4>{getPlayerTop(orientation!)}</h4>
+                <h4 className="player-name">{getPlayerTop(orientation!)}</h4>
                 </div>
                 <div className="col text-end">
-                <h4>{getTimeTop(orientation!, curMove!, whiteTimesSum!, blackTimesSum!)}</h4>
+                <h4 className="time-control">{getTimeTop(orientation!, curMove!, whiteTimesSum!, blackTimesSum!)}</h4>
                 </div>
                 </div>
 
@@ -387,10 +392,10 @@ function Game() {
 
                 <div className="bottom-row row">
                 <div className="col">
-                <h4>{getPlayerBottom(orientation!)}</h4>
+                <h4 className="player-name">{getPlayerBottom(orientation!)}</h4>
                 </div>
                 <div className="col text-end">
-                <h4>{getTimeBottom(orientation!, curMove!, whiteTimesSum!, blackTimesSum!)}</h4>
+                <h4 className="time-control">{getTimeBottom(orientation!, curMove!, whiteTimesSum!, blackTimesSum!)}</h4>
                 </div>
                 </div>
 

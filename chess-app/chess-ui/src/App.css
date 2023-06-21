@@ -25,8 +25,8 @@
   text-decoration: none;
 }
 
-.time-control {
-  border: 1px solid red;
+.time-control, .player-name {
+  color: white;
 }
 
 .move:hover {
