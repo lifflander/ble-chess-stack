@@ -79,12 +79,12 @@ function Game() {
             seconds = Math.floor((duration / 1000) % 60),
             minutes = Math.floor((duration / (1000 * 60)) % 60),
             hours = Math.floor((duration / (1000 * 60 * 60)) % 24)
-        const addZero = (num : number) : string => {
-            return num < 10 ? "0" + num : num.toString();
+        const addZero = (num : number, hasLeading : boolean) : string => {
+            return num < 10 && hasLeading ? "0" + num : num.toString();
         }
-        return (hours != 0 ? addZero(hours) + ":" : "") +
-               (minutes != 0 ? addZero(minutes) + ":" : "") +
-               addZero(seconds) + "." + milliseconds
+        return (hours != 0 ? addZero(hours, false) + ":" : "") +
+               (minutes != 0 ? addZero(minutes, hours != 0) + ":" : "") +
+               addZero(seconds, minutes != 0) + "." + milliseconds
     }
 
     const setTimes = (g : Game) => {
