@@ -1,6 +1,7 @@
 from enum import Enum, unique, Flag
 import time
 import multiprocessing
+import requests
 
 from utils.get_moves import get_moves
 from utils import reader_writer, usbtool
@@ -34,6 +35,9 @@ if __name__ == "__main__":
     LAST_MOVE = None
     QUEUE = None
     ROTATED = False
+    NEW_GAME = False
+    GAME_ID = 0
+    URL = "http://localhost:5000/"
 
     def waitFor(seconds):
         time.sleep(seconds)
@@ -47,6 +51,8 @@ if __name__ == "__main__":
         global USB_READER
         global LED_MANAGER
         global QUEUE
+        global NEW_GAME
+        global GAME_ID
 
         CONNECTION_ADDRESS = usbtool.find_address()
 
@@ -90,6 +96,22 @@ if __name__ == "__main__":
     def rotate(x):
         return x[::-1]
 
+    def publishMove(move):
+        global GAME_ID
+        global NEW_GAME
+
+        if NEW_GAME:
+            newgame = {"title": "auto-generated"}
+            res = requests.post(URL + "games/", json=newgame)
+            GAME_ID = res.json()["id"]
+            print("gameid=", GAME_ID)
+            NEW_GAME = False
+        newmove = {
+            "gameID": GAME_ID,
+            "pgn": move
+        }
+        res = requests.post(URL + "moves/", json=newmove)
+
     def stateNewGame(state):
         print("stateNewGame")
         assert(state == State.NewGame)
@@ -97,8 +119,10 @@ if __name__ == "__main__":
         global VIRTUAL_BOARD
         global LAST_MOVE
         global ROTATED
+        global NEW_GAME
 
         LAST_MOVE = None
+        NEW_GAME = True
 
         LED_MANAGER.set_leds("corners")
 
@@ -239,6 +263,7 @@ if __name__ == "__main__":
         # print("OUT OF LOOP: ", new_fen)
 
         for move in moves:
+            publishMove(move)
             print("pushing move: ", move)
             VIRTUAL_BOARD.push_uci(move)
             p1 = move[0] + move[1]
