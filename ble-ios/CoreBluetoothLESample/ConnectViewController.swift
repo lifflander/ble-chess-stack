@@ -39,6 +39,8 @@ class ConnectViewController : UIViewController {
         readView.dataSource = self
         readView.delegate = self
 
+        UIApplication.shared.isIdleTimerDisabled = true
+
         let url = URL(string: baseURL)!
         webView.load(URLRequest(url: url))
         webView.allowsBackForwardNavigationGestures = true
