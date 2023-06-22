@@ -2,6 +2,7 @@ from enum import Enum, unique, Flag
 import time
 import multiprocessing
 import requests
+import urllib3
 
 from utils.get_moves import get_moves
 from utils import reader_writer, usbtool
@@ -37,7 +38,8 @@ if __name__ == "__main__":
     ROTATED = False
     NEW_GAME = False
     GAME_ID = 0
-    URL = "http://localhost:5000/"
+    URL = "https://liff.us-west-2.elasticbeanstalk.com/"
+    DO_PUBLISH = False
 
     def waitFor(seconds):
         time.sleep(seconds)
@@ -99,18 +101,20 @@ if __name__ == "__main__":
     def publishMove(move):
         global GAME_ID
         global NEW_GAME
+        global DO_PUBLISH
 
-        if NEW_GAME:
-            newgame = {"title": "auto-generated"}
-            res = requests.post(URL + "games/", json=newgame)
-            GAME_ID = res.json()["id"]
-            print("gameid=", GAME_ID)
-            NEW_GAME = False
-        newmove = {
-            "gameID": GAME_ID,
-            "pgn": move
-        }
-        res = requests.post(URL + "moves/", json=newmove)
+        if DO_PUBLISH:
+            if NEW_GAME:
+                newgame = {"title": "auto-generated"}
+                res = requests.post(URL + "games/", json=newgame, verify=False)
+                GAME_ID = res.json()["id"]
+                print("gameid=", GAME_ID)
+                NEW_GAME = False
+            newmove = {
+                "gameID": GAME_ID,
+                "pgn": move
+            }
+            res = requests.post(URL + "moves/", json=newmove, verify=False)
 
     def stateNewGame(state):
         print("stateNewGame")
@@ -303,6 +307,8 @@ if __name__ == "__main__":
         return State.NewGame
 
     s = State.Connecting
+
+    urllib3.disable_warnings(urllib3.exceptions.InsecureRequestWarning)
 
     while s != State.Done:
         if s == State.Connecting:

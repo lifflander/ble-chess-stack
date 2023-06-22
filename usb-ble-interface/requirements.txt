@@ -1,0 +1,7 @@
+requests
+python-chess
+pyserial
+appdirs
+bleak
+bless
+
