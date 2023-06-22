@@ -195,7 +195,9 @@ extension ScanViewController : CBPeripheralDelegate {
                 let vc = UIStoryboard(name: "Main", bundle: nil).instantiateViewController(withIdentifier: "ConnectViewController") as! ConnectViewController;
 
                 currentPeripheral = peripheral
-                self.present(vc, animated: true, completion: nil)
+                self.addChild(vc)
+                self.view.addSubview(vc.view)
+                //self.present(vc, animated: true, completion: nil)
                 vc.connectLabel.text = "Connected to: " + (peripheral.name ?? "")
                 vc.svc = self
                 connectViewController = vc
@@ -216,6 +218,7 @@ extension ScanViewController : CBPeripheralDelegate {
         
         os_log("Received %d bytes: %s", characteristicData.count, stringFromData)
         connectViewController?.readStrings.append(stringFromData)
+        connectViewController?.newMove(move: stringFromData)
         connectViewController?.readView.reloadData()
     }
     

@@ -16,6 +16,7 @@
 		012C307E226FD59500BADEF9 /* TransferService.swift in Sources */ = {isa = PBXBuildFile; fileRef = 012C307D226FD59500BADEF9 /* TransferService.swift */; };
 		8C33E62E2A29398E00C54D1A /* ScanViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C33E62D2A29398E00C54D1A /* ScanViewController.swift */; };
 		8C33E6302A29566500C54D1A /* ConnectViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8C33E62F2A29566500C54D1A /* ConnectViewController.swift */; };
+		8CC7C67C2A44BED400255E45 /* Alamofire in Frameworks */ = {isa = PBXBuildFile; productRef = 8CC7C67B2A44BED400255E45 /* Alamofire */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
@@ -39,6 +40,7 @@
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				8CC7C67C2A44BED400255E45 /* Alamofire in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -112,6 +114,9 @@
 			dependencies = (
 			);
 			name = "BLE-Chess";
+			packageProductDependencies = (
+				8CC7C67B2A44BED400255E45 /* Alamofire */,
+			);
 			productName = BTLETransfer;
 			productReference = 012C3064226FD13B00BADEF9 /* BLE-Chess.app */;
 			productType = "com.apple.product-type.application";
@@ -142,6 +147,9 @@
 				Base,
 			);
 			mainGroup = 012C305B226FD13B00BADEF9;
+			packageReferences = (
+				8CC7C67A2A44BED400255E45 /* XCRemoteSwiftPackageReference "Alamofire" */,
+			);
 			productRefGroup = 012C3065226FD13B00BADEF9 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -386,6 +394,25 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCRemoteSwiftPackageReference section */
+		8CC7C67A2A44BED400255E45 /* XCRemoteSwiftPackageReference "Alamofire" */ = {
+			isa = XCRemoteSwiftPackageReference;
+			repositoryURL = "https://github.com/Alamofire/Alamofire.git";
+			requirement = {
+				kind = upToNextMajorVersion;
+				minimumVersion = 5.0.0;
+			};
+		};
+/* End XCRemoteSwiftPackageReference section */
+
+/* Begin XCSwiftPackageProductDependency section */
+		8CC7C67B2A44BED400255E45 /* Alamofire */ = {
+			isa = XCSwiftPackageProductDependency;
+			package = 8CC7C67A2A44BED400255E45 /* XCRemoteSwiftPackageReference "Alamofire" */;
+			productName = Alamofire;
+		};
+/* End XCSwiftPackageProductDependency section */
 	};
 	rootObject = 012C305C226FD13B00BADEF9 /* Project object */;
 }

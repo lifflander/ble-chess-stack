@@ -10,6 +10,7 @@ import Foundation
 import CoreBluetooth
 import UIKit
 import WebKit
+import Alamofire
 
 class ReadDataCell : UITableViewCell {
     @IBOutlet weak var lblReadString : UILabel!
@@ -24,11 +25,23 @@ class ConnectViewController : UIViewController {
     
     var svc : ScanViewController!
     var readStrings : [String] = []
+    var firstmove : Bool = true
+    var gameID : Int = 0
+    let baseURL = "https://master.d1qyxtjx2nwnzp.amplifyapp.com/"
+    let serverURL = "https://liff.us-west-2.elasticbeanstalk.com/"
+
+    struct GameJSON : Decodable {
+        let id : Int
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         readView.dataSource = self
         readView.delegate = self
+
+        let url = URL(string: baseURL)!
+        webView.load(URLRequest(url: url))
+        webView.allowsBackForwardNavigationGestures = true
     }
     
     @IBAction func writeBtnClick(sender: Any) {
@@ -38,6 +51,46 @@ class ConnectViewController : UIViewController {
         writeText.text = ""
         svc.writeData(str_to_write: str)
         writeText.endEditing(true)
+    }
+
+    func sendMove(move: String) {
+        let json : [String: Any] = ["gameID": gameID, "pgn": move]
+        let ret = AF.request(serverURL + "moves", method: .post, parameters: json, encoding: JSONEncoding.default)
+            .validate()
+            .responseJSON{response in
+                switch response.result {
+                case .success(let response):
+                    print(response)
+                    self.webView.reload()
+                case .failure(let error):
+                    print(error.localizedDescription)
+                }
+            }
+    }
+
+    func newMove(move : String) {
+        print("newMove: move=", move, " firstmove=", firstmove)
+        if firstmove {
+            let json : [String: String] = ["title": "auto-gen swift"]
+            let ret = AF.request(serverURL + "games", method: .post, parameters: json, encoding: JSONEncoding.default)
+                .validate()
+                .responseJSON{response in
+                    switch response.result {
+                    case .success(let res):
+                        guard let j = try? JSONDecoder().decode(GameJSON.self, from: response.data!) else { return }
+                        self.gameID = j.id
+                        print("id", j.id)
+                        print(res)
+                        self.webView.reload()
+                        self.sendMove(move: move)
+                    case .failure(let error):
+                        print(error.localizedDescription)
+                    }
+                }
+            firstmove = false
+        } else {
+            self.sendMove(move: move)
+        }
     }
 }
 
