@@ -273,12 +273,12 @@ function Game() {
         setTimeDirection(!direction)
     }
 
-    const getPlayerTop = (o : boolean) => {
-        return getPlayerName(o)
+    const getPlayerTop = (o : boolean, whiteName : string, blackName : string) => {
+        return getPlayerName(o, whiteName, blackName)
     }
 
-    const getPlayerBottom = (o : boolean) => {
-        return getPlayerName(!o)
+    const getPlayerBottom = (o : boolean, whiteName : string, blackName : string) => {
+        return getPlayerName(!o, whiteName, blackName)
     }
 
     const getTimeTop = (o : boolean, m : number, whiteTimesSumLocal : number[], blackTimesSumLocal : number[], direction : boolean)  => {
@@ -295,6 +295,9 @@ function Game() {
         await client.put('games/' + game!.id, update).then(json => {
             console.log(json)
         })
+        if (gameID !== undefined) {
+            getGame(+gameID)
+        }
     }
 
     const submitBlackName = async (e : React.FormEvent<HTMLFormElement>) => {
@@ -303,6 +306,9 @@ function Game() {
         await client.put('games/' + game!.id, update).then(json => {
             console.log(json)
         })
+        if (gameID !== undefined) {
+            getGame(+gameID)
+        }
     }
 
     const submitTimeControl = async (e : React.FormEvent<HTMLFormElement>) => {
@@ -311,6 +317,9 @@ function Game() {
         await client.put('games/' + game!.id, update).then(json => {
             console.log(json)
         })
+        if (gameID !== undefined) {
+            getGame(+gameID)
+        }
     }
 
     const getTime = (color : boolean, m : number, whiteTimesSumLocal : number[], blackTimesSumLocal : number[], direction : boolean) => {
@@ -342,7 +351,7 @@ function Game() {
         }
     }
 
-    const getPlayerName = (color : boolean) => {
+    const getPlayerName = (color : boolean, whiteName : string, blackName : string) => {
         if (color) {
             if (game?.whiteName) {
                 return (<span>{game?.whiteName}</span>)
@@ -397,7 +406,7 @@ function Game() {
 
                 <div className="top-row row">
                 <div className="col">
-                <h4 className="player-name">{getPlayerTop(orientation!)}</h4>
+                <h4 className="player-name">{getPlayerTop(orientation!, whiteName!, blackName!)}</h4>
                 </div>
                 <div className="col text-end">
                 <h4 className="time-control">{getTimeTop(orientation!, curMove!, whiteTimesSum!, blackTimesSum!, timeDirection!)}</h4>
@@ -414,7 +423,7 @@ function Game() {
 
                 <div className="bottom-row row">
                 <div className="col">
-                <h4 className="player-name">{getPlayerBottom(orientation!)}</h4>
+                <h4 className="player-name">{getPlayerBottom(orientation!, whiteName!, blackName!)}</h4>
                 </div>
                 <div className="col text-end">
                 <h4 className="time-control">{getTimeBottom(orientation!, curMove!, whiteTimesSum!, blackTimesSum!, timeDirection!)}</h4>
