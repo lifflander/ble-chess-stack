@@ -136,7 +136,9 @@ function App() {
                    <button type="submit">Add Game</button>
                    </form>
               </div> */}
-	      <div className="table-holder">
+	    <div className='container game-tables'>
+        <div className='row'>
+        <div className='col'>
               <table id="games" className="table table-sm Table-color">
               <thead className="thead-dark">
                 <tr>
@@ -150,7 +152,10 @@ function App() {
               </thead>
               <tbody>{renderTableDone()}</tbody>
               </table>
-
+        </div>
+        </div>
+        <div className='row'>
+        <div className='col'>
               <table id="games" className="table table-sm Table-color">
               <thead className="thead-dark">
                 <tr>
@@ -163,7 +168,10 @@ function App() {
               </thead>
               <tbody>{renderTableOther()}</tbody>
               </table>
-
+        </div>
+        </div>
+        <div className='row'>
+        <div className='col'>
               <table id="games" className="table table-sm Table-color">
               <thead className="thead-dark">
                 <tr>
@@ -176,6 +184,8 @@ function App() {
               </thead>
               <tbody>{renderTableZero()}</tbody>
               </table>
+        </div>
+        </div>
 	    </div>
             </header>
         </div>

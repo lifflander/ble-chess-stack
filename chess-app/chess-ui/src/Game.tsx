@@ -433,8 +433,9 @@ function Game() {
 
                 <div className="row">
                 <div className="col-12">
-                <button className="btn btn-secondary" onClick={() => switchOrientation(orientation!)}>Swap orientation</button>
-                <button className="btn btn-secondary" onClick={() => switchTimeDirection(timeDirection!)}>Swap time direction</button>
+                <button className="btn btn-secondary spacer" onClick={() => switchOrientation(orientation!)}>Swap orientation</button>
+                <button className="btn btn-secondary spacer" onClick={() => switchTimeDirection(timeDirection!)}>Swap time direction</button>
+                <a href={"/"}>Back</a>
                 </div>
                 </div>
             </div>

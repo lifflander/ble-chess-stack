@@ -26,6 +26,14 @@
   text-decoration: none;
 }
 
+.game-tables {
+  font-size: calc(8px + 1vmin);
+}
+
+.spacer {
+  margin-right: 5px;
+}
+
 .time-control, .player-name {
   color: white;
 }
