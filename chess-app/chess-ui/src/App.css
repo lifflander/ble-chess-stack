@@ -15,6 +15,7 @@
 
 .table-holder {
   width: 75%;
+  font-size: 20px;
 }
 .chess-board {
   height: fit-content;
