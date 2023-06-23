@@ -136,9 +136,9 @@ if __name__ == "__main__":
 
         print("about to spin")
         while VIRTUAL_BOARD.board_fen() != current_fen and VIRTUAL_BOARD.board_fen() != rotate(current_fen):
-            print("spinning", current_fen)
+            #print("spinning", current_fen)
             current_fen = USB_READER.read_board(update=True)
-            waitFor(seconds=0.2)
+            waitFor(seconds=0.1)
 
         if VIRTUAL_BOARD.board_fen() == rotate(current_fen):
             ROTATED = True
