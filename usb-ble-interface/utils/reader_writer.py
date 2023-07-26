@@ -532,6 +532,7 @@ class LedWriter:
             "center": LedWriter.squares2led(["d4", "e4", "d5", "e5"]),
             "thinking": LedWriter.squares2led(["d4", "e4", "d5", "e5"]),
             "setup": [255, 255, 8, 0, 0, 8, 255, 255],
+            "newgame": [255, 255, 0, 0, 0, 0, 255, 255],
         }
 
         self.last_message = None

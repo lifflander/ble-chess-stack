@@ -7,6 +7,7 @@ import urllib3
 from utils.get_moves import get_moves
 from utils import reader_writer, usbtool
 from utils import logger
+from utils.reader_writer import Piece
 
 from ble_tool import startBLETool
 
@@ -148,7 +149,7 @@ if __name__ == "__main__":
             ROTATED = False
 
         print("done")
-        LED_MANAGER.set_leds()
+        LED_MANAGER.set_leds("newgame")
 
         CURRENT_CODES = USB_READER.get_codes()
 
@@ -211,6 +212,20 @@ if __name__ == "__main__":
             if highligted_leds:
                 misplaced_pieces = True
 
+                outcome = checkForSpecialConditions(new_codes)
+
+                if outcome == 0:
+                    LED_MANAGER.set_leds("center")
+                    return state.EndOfGame
+                if outcome == 1:
+                    LED_MANAGER.set_leds(["d3", "d4", "e3", "e4"], ROTATED)
+                    print("winner white")
+                    return state.EndOfGame
+                if outcome == 2:
+                    LED_MANAGER.set_leds(["d5", "d6", "e5", "e6"], ROTATED)
+                    print("winner black")
+                    return state.EndOfGame
+
             if not highligted_leds and LAST_MOVE:
                 LED_MANAGER.set_leds(LAST_MOVE + check_squares, ROTATED)
 
@@ -237,6 +252,39 @@ if __name__ == "__main__":
         CURRENT_CODES = new_codes
 
         return state.WaitingForInput
+
+    def checkForSpecialConditions(codes):
+        COLUMNS_LETTERS = {"a":0, "b":1, "c":2, "d":3, "e":4, "f":5, "g":6, "h":7}
+
+        draw = [("e4", "e5"), ("d4", "d5")]
+        white = [("e4", "d5")]
+        black = [("d4", "e5")]
+
+        def piece(pos):
+            idx = (9 - int(pos[1])) * 8 - COLUMNS_LETTERS[pos[0]] - 1
+            #print("idx = ", idx, "pos = ", pos)
+            return USB_READER.code_mapping_to_piece[codes[idx]]
+
+        def tryPos(positions):
+            for pos in positions:
+                p1 = pos[0]
+                p2 = pos[1]
+                if (piece(p1) == Piece.K or piece(p1) == Piece.k) and (piece(p2) == Piece.K or piece(p2) == Piece.k):
+                    return True
+            return False
+
+        is_draw = tryPos(draw)
+        is_white_win = tryPos(white)
+        is_black_win = tryPos(black)
+
+        if is_draw:
+            return 0
+        elif is_white_win:
+            return 1
+        elif is_black_win:
+            return 2
+        else:
+            return -1
 
     def stateEndOfGame(state):
         print("stateEndOfGame")
