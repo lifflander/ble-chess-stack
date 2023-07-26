@@ -85,7 +85,7 @@ class BoardReader:
     def __init__(self, portname):
         self.queue = usbtool.QUEUE_FROM_USBTOOL
 
-        self.data_history_depth = 3
+        self.data_history_depth = 1
         self.data_history_pointer = 0
         self.data_history_counter = 0
         self.data_history = [""] * self.data_history_depth
@@ -512,7 +512,7 @@ class LedWriter:
         self.full_leds = None
         self.blink_leds = None
 
-        self.flash_frequency = 0.1  # seconds
+        self.flash_frequency = 0.5  # seconds
         self.flash_timer = 0
         self.counter = 0
 
