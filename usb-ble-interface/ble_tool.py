@@ -16,7 +16,7 @@ char_uuid = "08590F7E-DB05-467E-8757-72F6FAEB13D4"
 service_uuid = "E20A39F4-73F5-4BC4-A12F-17D1AD07A961"
 
 trigger: threading.Event = threading.Event()
-# logging.basicConfig(level=logging.DEBUG)
+#logging.basicConfig(level=logging.DEBUG)
 logger = logging.getLogger(name=__name__)
 
 def read_request(

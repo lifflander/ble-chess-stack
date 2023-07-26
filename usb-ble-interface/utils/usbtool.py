@@ -78,6 +78,7 @@ def _usbtool(address_chessboard, queue_to_usbtool, queue_from_usbtool, buffer_ms
 
             # Send message to board
             if message_to_board and time.time() >= time_last_message_to_board + buffer:
+                # print("Sending message:", message_to_board)
                 data = message_to_board.pop()
                 try:
                     socket.reset_output_buffer()
@@ -106,6 +107,7 @@ def _usbtool(address_chessboard, queue_to_usbtool, queue_from_usbtool, buffer_ms
                             :-2
                         ]  # Remove trailing ' /r'
                         if len(message_from_board.split(" ")) == 320:  # 64*5
+                            # print("Putting message: ", message_from_board)
                             queue_from_usbtool.put(message_from_board)
 
                         message_from_board = ""
@@ -194,7 +196,7 @@ def find_address(
             return False
         else:
             serial_device.close()
-            log.debug("Port is available")
+            log.debug(f"Port is available {serial_device}")
             return True
 
     devices_wrong_description = []

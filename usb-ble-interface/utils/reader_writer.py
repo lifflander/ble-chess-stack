@@ -98,6 +98,7 @@ class BoardReader:
         self.board_fen = chess.Board().board_fen()
         self.board_fen_missing = self.board_fen
         self.counter = Counter()
+        self.empty_code = ("0", "0", "0", "0", "0")
 
         self.needs_calibration = False
         self.code_mapping_order = (
@@ -122,9 +123,13 @@ class BoardReader:
         )
         print(self.calibration_filepath)
         self.code_mapping = {}
+        self.code_mapping_unique = {}
+        self.code_mapping_to_piece = {}
         self.load_piece_codes()
         self.cell_slice_mapping = [slice(cell * 5, cell * 5 + 5) for cell in range(64)]
+        print(self.cell_slice_mapping)
         self.previous_board = []
+        self.current_codes = []
 
     def load_piece_codes(self):
         mapping = {}
@@ -142,8 +147,24 @@ class BoardReader:
                 key = tuple(str(c) for c in piece_variation)
                 mapping[key] = letter
         print(mapping)
-        mapping[("0", "0", "0", "0", "0")] = Piece.Empty
+        mapping[self.empty_code] = Piece.Empty
+        i = 0;
+        for code in mapping:
+            self.code_mapping_unique[code] = i
+            self.code_mapping_to_piece[i] = mapping[code]
+            i += 1
+        print(self.code_mapping_unique)
         self.code_mapping = mapping
+
+    def get_codes(self):
+        return self.current_codes
+
+    def transposeCodes(self, codes):
+        transposed_codes = []
+        for row in reversed(range(8)):
+            for col in range(8):
+                transposed_codes.append(codes[row * 8 + col])
+        return transposed_codes
 
     def data_to_fen(self):
         # print("data_to_fen")
@@ -152,18 +173,24 @@ class BoardReader:
         board = []
         for cell_range in self.cell_slice_mapping:
             sample = (
-                self.code_mapping.get(tuple(sample[cell_range]), Piece.Unknown)
+                self.code_mapping_unique.get(tuple(sample[cell_range]), self.code_mapping_unique[self.empty_code])
                 for sample in data_history
             )
             self.counter.update(sample)
             most_common_code, most_common_counts = self.counter.most_common(1)[0]
             # If unknown readings are not reliable, consider them empty squares
-            if most_common_code == Piece.Unknown and most_common_counts < self.data_history_depth:
-                most_common_code = Piece.Empty
+            if most_common_counts < self.data_history_depth:
+                most_common_code = self.code_mapping_unique[self.empty_code]
 
             board.append(most_common_code)
+
             self.counter.clear()
 
+        self.current_codes = self.transposeCodes(board)
+        mapped = map(lambda code: self.code_mapping_to_piece[code], board)
+        board = list(mapped)
+
+        # print("Codes:", board)
         self.previous_board = board
 
         def board_to_fen(board, ignore_unknown):
@@ -356,12 +383,12 @@ class BoardReader:
             self.update()
 
         if rotate180:
-            return self.board_fen[::-1]
+            return (self.board_fen[::-1], self.current_codes[::-1])
 
         # log.debug(
         #     f"UsbReader: Computing FEN -> current board - {self.board_fen} "
         # )
-        return self.board_fen
+        return (self.board_fen, self.current_codes)
 
     def board_changed(self):
         return self.update()
@@ -375,6 +402,7 @@ class BoardReader:
 
         board_reading = []
         for n_cell, cell_range in enumerate(self.cell_slice_mapping):
+            print(n_cell, cell_range)
             cell_readings = []
 
             cell_id = COLUMNS_LETTERS[n_cell % 8] + str(8 - n_cell // 8)
@@ -656,6 +684,24 @@ class LedWriter:
             leds[row] += col
 
         return leds
+
+    def highlight_misplaced_pieces_exact(self, current_codes, new_codes, rotate180, display_leds_immediately):
+        bad_squares = []
+        for square in range(64):
+            if current_codes[square] != new_codes[square]:
+                bad_squares.append(chess.SQUARE_NAMES[square])
+
+        if len(bad_squares) != 0:
+            # print("BAD: ", bad_squares)
+            if bad_squares == self.last_misplaced_comparison and time.time() - self.misplaced_clock > self.misplaced_wait_time:
+                self.flash_leds(bad_squares, rotate180)
+                return True
+            else:
+                if bad_squares != self.last_misplaced_comparison:
+                    self.misplaced_clock = time.time()
+                    self.last_misplaced_comparison = bad_squares
+        return False
+
 
     def highlight_misplaced_pieces(
         self,

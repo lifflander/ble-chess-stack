@@ -33,6 +33,7 @@ if __name__ == "__main__":
     USB_READER = None
     LED_MANAGER = None
     VIRTUAL_BOARD = None
+    CURRENT_CODES = None
     LAST_MOVE = None
     QUEUE = None
     ROTATED = False
@@ -124,20 +125,21 @@ if __name__ == "__main__":
         global LAST_MOVE
         global ROTATED
         global NEW_GAME
+        global CURRENT_CODES
 
         LAST_MOVE = None
         NEW_GAME = True
 
         LED_MANAGER.set_leds("corners")
 
-        current_fen = USB_READER.read_board()
+        (current_fen, _) = USB_READER.read_board()
 
         VIRTUAL_BOARD = chess.Board()
 
         print("about to spin")
         while VIRTUAL_BOARD.board_fen() != current_fen and VIRTUAL_BOARD.board_fen() != rotate(current_fen):
             #print("spinning", current_fen)
-            current_fen = USB_READER.read_board(update=True)
+            (current_fen, _) = USB_READER.read_board(update=True)
             waitFor(seconds=0.1)
 
         if VIRTUAL_BOARD.board_fen() == rotate(current_fen):
@@ -148,6 +150,11 @@ if __name__ == "__main__":
         print("done")
         LED_MANAGER.set_leds()
 
+        CURRENT_CODES = USB_READER.get_codes()
+
+        if ROTATED:
+            CURRENT_CODES = rotate(CURRENT_CODES)
+
         return State.WaitingForInput
 
     def stateWaitingForInput(state):
@@ -157,6 +164,7 @@ if __name__ == "__main__":
         global LAST_MOVE
         global QUEUE
         global ROTATED
+        global CURRENT_CODES
 
         # It's checkmate or a repetition
         outcome = VIRTUAL_BOARD.outcome(claim_draw=False)
@@ -187,49 +195,18 @@ if __name__ == "__main__":
         elif LAST_MOVE:
             LED_MANAGER.set_leds(LAST_MOVE, ROTATED)
 
-        # ret = USB_READER.update_find_move()
-        # while ret == None:
-        #     ret = USB_READER.update_find_move()
-
-        # # print("ret=", ret)
-
-        # if VIRTUAL_BOARD.is_legal(chess.Move.from_uci(ret[0] + ret[1])):
-        #     print("directly moving on: ", ret[0], ret[1])
-        #     VIRTUAL_BOARD.push_uci(ret[0] + ret[1])
-        #     LED_MANAGER.set_leds(ret)
-        #     LAST_MOVE = ret
-
-        #     QUEUE.put(bytes(ret[0]+ret[1], 'utf-8'))
-
-        #     return state.WaitingForInput
-
-        # while not USB_READER.board_changed():
-        #     pass
-
-        new_fen = USB_READER.read_board(update=True)
-
-        # print("legal moves: ", list(VIRTUAL_BOARD.generate_legal_moves()))
-
-        if ROTATED:
-            new_fen = rotate(new_fen)
-        moves = get_moves(
-            VIRTUAL_BOARD, new_fen, check_double_moves=True
-        )
+        # Read the board
+        (new_fen, new_codes) = USB_READER.read_board(update=True, rotate180=ROTATED)
+        moves = get_moves(VIRTUAL_BOARD, new_fen, CURRENT_CODES, new_codes, check_double_moves=True)
 
         misplaced_pieces = False
 
         while not moves:
-            # waitFor(seconds=1)
-            # there a a big problem...
-            highligted_leds = (
-                LED_MANAGER.highlight_misplaced_pieces(
-                    new_fen,
-                    VIRTUAL_BOARD,
-                    ROTATED,
-                    False,
-                    False
-                )
-            )
+            highligted_leds = False
+
+            if CURRENT_CODES != new_codes:
+                # Highlight any missing pieces
+                highligted_leds = LED_MANAGER.highlight_misplaced_pieces_exact(CURRENT_CODES, new_codes, ROTATED, False)
 
             if highligted_leds:
                 misplaced_pieces = True
@@ -237,34 +214,15 @@ if __name__ == "__main__":
             if not highligted_leds and LAST_MOVE:
                 LED_MANAGER.set_leds(LAST_MOVE + check_squares, ROTATED)
 
-            if not misplaced_pieces:
-                while not USB_READER.board_changed():
-                    pass
+            # if not misplaced_pieces:
+            #     while not USB_READER.board_changed():
+            #         pass
 
-                new_fen = USB_READER.read_board(update=True)
-
-                # print("legal moves 1: ", list(VIRTUAL_BOARD.generate_legal_moves()))
-                # print("new fen 1:", new_fen)
-
-
-                if ROTATED:
-                    new_fen = rotate(new_fen)
-                moves = get_moves(
-                    VIRTUAL_BOARD, new_fen, check_double_moves=True
-                )
-            else:
-                new_fen = USB_READER.read_board(update=True)
-
-                # print("legal moves 2: ", list(VIRTUAL_BOARD.generate_legal_moves()))
-                # print("new fen 2:", new_fen)
-
-                if ROTATED:
-                    new_fen = rotate(new_fen)
-                moves = get_moves(
-                    VIRTUAL_BOARD, new_fen, check_double_moves=True
-                )
-
-        # print("OUT OF LOOP: ", new_fen)
+            (new_fen, new_codes) = USB_READER.read_board(update=True, rotate180=ROTATED)
+            if CURRENT_CODES != new_codes:
+                # print("Getting moves")
+                moves = get_moves(VIRTUAL_BOARD, new_fen, CURRENT_CODES, new_codes, check_double_moves=True)
+                # print("Got moves: ", moves)
 
         for move in moves:
             publishMove(move)
@@ -274,8 +232,9 @@ if __name__ == "__main__":
             p2 = move[2] + move[3]
             LED_MANAGER.set_leds([p1, p2], ROTATED)
             LAST_MOVE = [p1, p2]
-
             QUEUE.put(bytes(p1+p2, 'utf-8'))
+
+        CURRENT_CODES = new_codes
 
         return state.WaitingForInput
 
@@ -284,22 +243,28 @@ if __name__ == "__main__":
 
         global LAST_MOVE
         global VIRTUAL_BOARD
+        global CURRENT_CODES
 
         VIRTUAL_BOARD = chess.Board()
         LAST_MOVE = None
 
-        current_fen = USB_READER.read_board(update=True)
+        (current_fen, _) = USB_READER.read_board(update=True)
 
         print("about to spin")
         while VIRTUAL_BOARD.board_fen() != current_fen and VIRTUAL_BOARD.board_fen() != rotate(current_fen):
             print("spinning", current_fen)
-            current_fen = USB_READER.read_board(update=True)
+            (current_fen, _) = USB_READER.read_board(update=True)
             waitFor(seconds=0.2)
 
         if VIRTUAL_BOARD.board_fen() == rotate(current_fen):
             ROTATED = True
         else:
             ROTATED = False
+
+        CURRENT_CODES = USB_READER.get_codes()
+
+        if ROTATED:
+            CURRENT_CODES = rotate(CURRENT_CODES)
 
         print("pieces are back")
         LED_MANAGER.set_leds()
